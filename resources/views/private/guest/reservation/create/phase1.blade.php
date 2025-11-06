@@ -82,7 +82,7 @@ $user = auth()->user();
             {{-- Tombol submit --}}
             <x-button type="submit"
                 class="w-full bg-violet-600 hover:bg-violet-700 text-white py-2 rounded-lg font-semibold">
-                Lanjut ke Pembayaran
+                Konfirmasi
             </x-button>
         </form>
     </x-card.index>
