@@ -83,9 +83,9 @@ Seeder akan membuat:
 
 - Admin default:
 
- - Username : admin
+ -- Username : admin
 
- -Password: admin
+ -- Password: admin
 
 ### 6️⃣ Jalankan Server
 ```bash
