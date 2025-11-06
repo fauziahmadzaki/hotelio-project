@@ -1,6 +1,14 @@
 <x-admin.layout>
     <x-slot:title>Manajemen Reservasi</x-slot:title>
 
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-xl font-bold text-gray-800">Daftar Reservasi</h1>
+        <x-button>
+            <a href="{{ route('receptionist.reservation.create') }}" class="text-white">
+                + Buat Reservasi
+            </a>
+        </x-button>
+    </div>
     <h1 class="text-2xl font-semibold text-gray-800 mb-5">Daftar Reservasi</h1>
 
     {{-- Flash Message --}}

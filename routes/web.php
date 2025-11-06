@@ -111,6 +111,9 @@ Route::middleware(['auth', 'role:receptionist,admin'])
             Route::get('/reservations',  'reservations')->name('reservations.index');
             Route::patch('/reservations/{id}',  'updateReservationStatus')->name('reservations.update');
         });
+            Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservation.create');
+            Route::post('/reservations/store', [ReservationController::class, 'store'])->name('reservation.store');
+
     });
 
 

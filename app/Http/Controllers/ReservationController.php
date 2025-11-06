@@ -26,9 +26,18 @@ class ReservationController extends Controller
     public function create(){
         $rooms = Room::where('room_status', 'available')->get();
         if($rooms->isEmpty()){
-             return redirect()->route('admin.reservations.index')->with('error', 'Tidak ada kamar yang tersedia!');
+             if(Auth::user()->role == 'receptionist'){
+                return redirect()->route('receptionist.reservations.index')->with('error', 'Tidak ada kamar yang tersedia');
+             }else{
+                return redirect()->route('admin.reservations.index')->with('error', 'Tidak ada kamar yang tersedia');
+             }
         }
-        return view('private.admin.reservations.create', compact('rooms'));
+        
+        if(Auth::user()->role == 'receptionist'){
+            return view('private.receptionist.reservation.create', compact('rooms'));
+        }else{
+            return view('private.admin.reservations.create', compact('rooms'));
+        }
     }
     
 
@@ -63,7 +72,11 @@ class ReservationController extends Controller
                 'room_status' => 'booked'
             ]);
             DB::commit();
-            return redirect()->route('admin.reservations.index')->with('success', 'Reservasi berhasil dibuat!');
+            if(Auth::user()->role == 'receptionist'){
+                return redirect()->route('receptionist.reservations.index')->with('success', 'Reservasi berhasil dibuat.');
+            }else{
+                return redirect()->route('admin.reservations.index')->with('success', 'Reservasi berhasil dibuat.');
+            }
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal membuat reservasi: '.$e->getMessage());

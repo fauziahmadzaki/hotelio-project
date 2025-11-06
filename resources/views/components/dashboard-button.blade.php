@@ -4,7 +4,7 @@ $link = '';
 if($user->role == 'admin'){
 $link = route('admin.dashboard');
 }else if($user->role == 'receptionist'){
-$link = route('receptionist.');
+$link = route('receptionist.dashboard');
 }else{
 $link = route('guest.dashboard');
 }
