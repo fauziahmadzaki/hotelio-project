@@ -50,7 +50,128 @@ git clone https://github.com/username/hotelio.git
 cd hotelio
 ```
 
-### tes
+### 2️⃣ Install Dependencies
+```bash
+composer install
+npm install
+```
+### 3️⃣ Buat File .env
+```bash
+cp .env.example .env
+```bash
+
+### 🧱 Lalu sesuaikan konfigurasi database:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=hotelio_db
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+4️⃣ Generate App Key
+php artisan key:generate
+
+5️⃣ Jalankan Migrasi & Seeder
+php artisan migrate --seed
+
+
+Seeder akan membuat:
+
+Admin default:
+
+Email: admin@hotelio.com
+
+Password: password
+
+Contoh kamar dan fasilitas
+
+6️⃣ Jalankan Server
+php artisan serve
+npm run dev
+
+
+Buka di browser:
+👉 http://localhost:8000
+
+📦 Struktur Folder Penting
+app/
+ ├─ Http/
+ │   ├─ Controllers/
+ │   │   ├─ AuthController.php
+ │   │   ├─ AdminController.php
+ │   │   ├─ GuestController.php
+ │   │   ├─ ReceptionistController.php
+ │   │   ├─ RoomController.php
+ │   │   ├─ ReservationController.php
+ │   │   └─ FacilityController.php
+ │   └─ Requests/
+ ├─ Models/
+ └─ Views/
+     ├─ private/
+     │   ├─ admin/
+     │   ├─ guest/
+     │   └─ receptionist/
+     └─ components/
+
+🧱 Database Schema (Ringkasan)
+Tabel	Deskripsi
+users	Data pengguna (admin, receptionist, user)
+rooms	Data kamar hotel
+facilities	Daftar fasilitas
+facility_room	Pivot antara rooms dan facilities
+reservations	Data pemesanan dan status
+🔒 Roles & Permissions
+Role	Akses
+Admin	Semua fitur (CRUD, Manajemen User, Dashboard)
+Receptionist	Kelola Reservasi & Check-in/out
+User (Guest)	Reservasi dan lihat riwayat
+💻 Beberapa Tampilan Utama
+🏠 Beranda
+
+Hero Section dengan CTA “Mulai Sekarang”
+
+Tentang Kami (About)
+
+Fasilitas Hotel
+
+Daftar Kamar Tersedia
+
+Kontak & Lokasi
+
+🔑 Autentikasi
+
+Login & Register dengan validasi
+
+Redirect otomatis sesuai role (Admin / Receptionist / User)
+
+📊 Dashboard Admin
+
+Statistik total kamar, pendapatan, dan jumlah pengguna
+
+Menu navigasi cepat (Kamar, Reservasi, Fasilitas, User)
+
+🧾 Reservasi Tamu
+
+Daftar reservasi dengan status
+
+Detail reservasi lengkap (tanggal, harga, status, total)
+
+🧑‍💻 Kontributor
+Nama	Peran
+[Nama Kamu]	Fullstack Developer
+🪶 Lisensi
+
+Proyek ini bersifat open-source dan dilisensikan di bawah MIT License.
+Silakan gunakan, ubah, dan kembangkan sesuai kebutuhan Anda.
+
+❤️ Kredit
+
+Dibuat dengan Laravel, TailwindCSS, dan banyak kopi ☕ oleh
+Nama Kamu
+
+
 
 
 ---
