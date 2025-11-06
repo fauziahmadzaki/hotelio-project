@@ -12,18 +12,13 @@ use App\Http\Requests\UpdateReservationRequest;
 
 class ReservationController extends Controller
 {
-    /**
-     * Tampilkan daftar semua reservasi.
-     */
+    
     public function index()
     {
         $reservations =  Reservation::with(['room'])->latest()->get();
         return view('private.admin.reservations.index', compact('reservations'));
     }
 
-    /**
-     * Form tambah reservasi.
-     */
     public function create(){
         $rooms = Room::where('room_status', 'available')->get();
         if($rooms->isEmpty()){
@@ -42,21 +37,16 @@ class ReservationController extends Controller
     }
     
 
-    /**
-     * Simpan reservasi baru.
-     */
     public function store(StoreReservationRequest $request)
     {
         $validated = $request->validated();
 
         DB::beginTransaction();
         try {
-            // Ambil harga kamar
             $room = Room::findOrFail($validated['room_id']);
             $days = now()->parse($validated['check_in_date'])->diffInDays(now()->parse($validated['check_out_date']));
             $totalPrice = $days * $room->room_price;
 
-            // Simpan reservasi
             Reservation::create([
                 'user_id' => Auth::user()->id,
                 'room_id' => $validated['room_id'],
@@ -84,17 +74,15 @@ class ReservationController extends Controller
         }
     }
 
-    /**
-     * Tampilkan detail reservasi.
-     */
+
     public function show(Reservation $reservation)
     {
          $rooms = Room::where('room_status', 'available')->get();
         return view('private.admin.reservations.edit', compact('reservation', 'rooms'));
     }
 
-public function update(UpdateReservationRequest $request, Reservation $reservation)
-{
+    public function update(UpdateReservationRequest $request, Reservation $reservation)
+    {
     $validated = $request->validated();
     DB::beginTransaction();
 
@@ -118,7 +106,7 @@ public function update(UpdateReservationRequest $request, Reservation $reservati
         DB::rollBack();
         return back()->with('error', 'Gagal memperbarui reservasi: '.$th->getMessage());
     }
-}
+    }
 
     /**
      * Hapus reservasi.

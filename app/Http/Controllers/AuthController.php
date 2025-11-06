@@ -12,19 +12,15 @@ use App\Http\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    /**
-     * Handle user login
-     */
+
     public function login(LoginRequest $request)
-{
+    {
     $validated = $request->validated();
-    $input = $request->input('email'); // Bisa berisi email atau name
+    $input = $request->input('email'); 
     $password = $request->input('password');
 
-    // Deteksi apakah input berupa email atau name
     $fieldType = filter_var($input, FILTER_VALIDATE_EMAIL) ? 'email' : 'name';
 
-    // Kalau pakai name → hanya boleh admin
     if ($fieldType === 'name') {
         $user = \App\Models\User::where('name', $input)->first();
 
@@ -34,7 +30,6 @@ class AuthController extends Controller
             ])->onlyInput('email');
         }
 
-        // Cek password manual
         if (!\Hash::check($password, $user->password)) {
             return back()->withErrors([
                 'email' => 'Kredensial tidak valid.',
@@ -66,21 +61,18 @@ class AuthController extends Controller
         'email' => 'Kredensial tidak valid.',
     ])->onlyInput('email');
 }
-    /**
-     * Handle user registration
-     */
+
     public function register(StoreUserRequest $request)
     {
         $validated = $request->validated();
 
-        // Buat user baru
+        
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
         ]);
 
-        // Otomatis buat profil kosong
         $user->profile()->create([
             'phone_number' => null,
             'address'      => null,
@@ -92,9 +84,7 @@ class AuthController extends Controller
             ->with('success', 'Registrasi berhasil! Silakan login.');
     }
 
-    /**
-     * Handle user logout
-     */
+  
     public function logout(Request $request)
     {
         Auth::logout();
@@ -105,17 +95,12 @@ class AuthController extends Controller
         return redirect('/');
     }
 
-    /**
-     * Show login form
-     */
     public function showLogin()
     {
         return view('auth.login');
     }
 
-    /**
-     * Show register form
-     */
+
     public function showRegister()
     {
         return view('auth.register');

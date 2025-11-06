@@ -41,7 +41,7 @@ public function store(StoreRoomRequest $request)
        $image = $request->file('image')
     ->storeAs('images', time().'.'.$request->file('image')->extension(), 'public');
        
-       $room =  Room::create([
+       $room = Room::create([
             'room_name'        => $validated['room_name'],
             'room_code'        => $validated['room_code'],
             'room_description' => $validated['room_description'],
@@ -72,12 +72,10 @@ public function store(StoreRoomRequest $request)
 }
 
    
-
 public function update(Request $request, $id)
 {
     $room = Room::findOrFail($id);
 
-    // Validasi input
     $validated = $request->validate([
         'room_name' => 'required|string|max:255',
         'room_code' => 'required|string|max:50|unique:rooms,room_code,' . $room->id,
@@ -93,14 +91,11 @@ public function update(Request $request, $id)
     try {
         \DB::beginTransaction();
 
-        // Jika ada file gambar baru, simpan & hapus yang lama
         if ($request->hasFile('image')) {
-            // hapus gambar lama
             if ($room->image && \Storage::disk('public')->exists($room->image)) {
                 \Storage::disk('public')->delete($room->image);
             }
 
-            // simpan gambar baru
             $validated['image'] = $request->file('image')->storeAs(
                 'images',
                 time() . '.' . $request->file('image')->extension(),
@@ -108,14 +103,14 @@ public function update(Request $request, $id)
             );
         }
 
-        // Update data kamar
+        
         $room->update($validated);
 
         
         if ($request->filled('facilities')) {
             $room->facilities()->sync($request->facilities);
         } else {
-            $room->facilities()->detach(); // kalau semua fasilitas dihapus
+            $room->facilities()->detach(); 
         }
 
         \DB::commit();
@@ -133,32 +128,32 @@ public function update(Request $request, $id)
     }
 }
 
-public function showRoomDetail($id)
-{
-    $room = \App\Models\Room::with('facilities')->findOrFail($id);
+    public function showRoomDetail($id)
+    {
+        $room = \App\Models\Room::with('facilities')->findOrFail($id);
 
-    return view('private.guest.detail', [
-        'title' => 'Detail Kamar - ' . $room->room_name,
-        'room' => $room,
-    ]);
-}
-
-
-
-public function destroy($id)
-{
-    $room = Room::find($id);
-    if (! $room) {
-        return redirect()->back()->with('error', 'Data kamar tidak ditemukan!');
+        return view('private.guest.detail', [
+            'title' => 'Detail Kamar - ' . $room->room_name,
+            'room' => $room,
+        ]);
     }
 
-    if ($room->image && Storage::disk('public')->exists($room->image)) {
-        Storage::disk('public')->delete($room->image);
-    }
 
-    $room->delete();
-    return redirect()
-        ->back()
-        ->with('success', 'Data kamar berhasil dihapus!');
-}
+
+    public function destroy($id)
+    {
+        $room = Room::find($id);
+        if (! $room) {
+            return redirect()->back()->with('error', 'Data kamar tidak ditemukan!');
+        }
+
+        if ($room->image && Storage::disk('public')->exists($room->image)) {
+            Storage::disk('public')->delete($room->image);
+        }
+
+        $room->delete();
+        return redirect()
+            ->back()
+            ->with('success', 'Data kamar berhasil dihapus!');
+    }
 }

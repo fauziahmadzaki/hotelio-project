@@ -29,10 +29,8 @@ class StoreReservationPhaseOneRequest extends FormRequest
         'room_id' => 'required|exists:rooms,id',
         'person_name' => 'required|string|max:255',
         'person_phone_number' => 'required|string|max:20',
-
         'check_in_date' => 'required|date|after_or_equal:today',
         'check_out_date' => 'required|date|after:check_in_date',
-
         'total_guests' => 'required|integer|min:1',
     ];
 }

@@ -14,17 +14,15 @@ class AdminController extends Controller
     //
      public function index()
     {
-        // Hitung total dasar
+    
         $totalUsers = User::count();
         $totalRooms = Room::count();
         $totalReservations = Reservation::count();
 
-        // Hitung total pendapatan (hanya dari reservasi yang sudah dikonfirmasi)
+       
        $totalRevenue = Reservation::whereIn('status', ['confirmed', 'checkin', 'completed'])
     ->sum('total_price');
 
-
-        // Statistik status reservasi
         $statusCounts = Reservation::select('status', DB::raw('COUNT(*) as count'))
             ->groupBy('status')
             ->pluck('count', 'status');
@@ -34,7 +32,6 @@ class AdminController extends Controller
         $cancelled = $statusCounts['cancelled'] ?? 0;
         $completed = $statusCounts['completed'] ?? 0;
 
-        // Ambil reservasi terbaru (dengan relasi user & room)
         $recentReservations = Reservation::with(['user:id,name', 'room:id,room_name'])
             ->latest()
             ->take(5)
@@ -43,7 +40,6 @@ class AdminController extends Controller
                 'check_out_date', 'status', 'total_price', 'created_at'
             ]);
 
-        // Data kamar
         $availableRooms = Room::where('room_status', 'available')->count();
         $bookedRooms    = Room::where('room_status', 'booked')->count();
 
@@ -62,9 +58,7 @@ class AdminController extends Controller
         ));
     }
 
-    /**
-     * Menampilkan semua reservasi (untuk manajemen admin)
-     */
+
     public function reservations()
     {
         $reservations = Reservation::with(['user:id,name,email', 'room:id,room_name'])
@@ -76,37 +70,37 @@ class AdminController extends Controller
 
 
 
-public function users(Request $request)
-{
-    $search = $request->input('search');
-    $query = User::query();
+    public function users(Request $request)
+    {
+        $search = $request->input('search');
+        $query = User::query();
 
-    if ($search) {
-        $query->where(function ($q) use ($search) {
-            $q->where('name', 'like', "%{$search}%")
-              ->orWhere('email', 'like', "%{$search}%");
-        });
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $users = $query->where('name', '!=', 'admin')->orderBy('created_at', 'desc')->paginate(10);
+
+        return view('private.admin.users.index', compact('users'));
     }
 
-    $users = $query->where('name', '!=', 'admin')->orderBy('created_at', 'desc')->paginate(10);
+    public function updateUserRole(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'role' => 'required|in:guest,receptionist,admin',
+        ]);
 
-    return view('private.admin.users.index', compact('users'));
-}
+        $user->update(['role' => $validated['role']]);
 
-public function updateUserRole(Request $request, User $user)
-{
-    $validated = $request->validate([
-        'role' => 'required|in:guest,receptionist,admin',
-    ]);
+        return redirect()->route('admin.users')->with('success', "Role {$user->name} berhasil diubah!");
+    }
 
-    $user->update(['role' => $validated['role']]);
-
-    return redirect()->route('admin.users')->with('success', "Role {$user->name} berhasil diubah!");
-}
-
-public function destroy(User $user)
-{
-    $user->delete();
-    return redirect()->route('admin.users')->with('success', "User  berhasil dihapus!");
-}
+    public function destroy(User $user)
+    {
+        $user->delete();
+        return redirect()->route('admin.users')->with('success', "User  berhasil dihapus!");
+    }
 }

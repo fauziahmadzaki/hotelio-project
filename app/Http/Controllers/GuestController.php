@@ -12,25 +12,19 @@ use App\Http\Requests\StoreReservationPhaseOneRequest;
 
 class GuestController extends Controller
 {
-    /**
-     * Dashboard Tamu
-     */
 
 public function index()
-{
+    {
     $user = auth()->user();
 
-    // Ambil semua data penting dalam satu query untuk mencegah N+1
     $reservations = Reservation::with('room')
         ->where('user_id', $user->id)
         ->get();
 
-    // Hitung jumlah berdasarkan status
     $pendingCount   = $reservations->where('status', 'pending')->count();
     $confirmedCount = $reservations->where('status', 'confirmed')->count();
     $cancelledCount = $reservations->where('status', 'cancelled')->count();
 
-    // Ambil reservasi terbaru (yang masih aktif)
     $latestReservation = $reservations
         ->whereIn('status', ['pending', 'confirmed'])
         ->sortByDesc('created_at')
@@ -43,14 +37,13 @@ public function index()
         'confirmedCount' => $confirmedCount,
         'cancelledCount' => $cancelledCount,
     ]);
-}
+    }
 
 
     public function getDashboardData()
-{
+    {
     $user = auth()->user();
 
-    // Ambil reservasi aktif (status pending atau confirmed)
     $latestReservation = Reservation::with('room')
         ->where('user_id', $user->id)
         ->whereIn('status', ['pending', 'confirmed'])
@@ -71,12 +64,8 @@ public function index()
     ];
 
     return response()->json($data);
-}
+    }
 
-
-    /**
-     * Halaman daftar reservasi user
-     */
     public function showReservation()
     {
         $reservations = Reservation::with('room')
@@ -87,9 +76,7 @@ public function index()
         return view('private.guest.reservation.index', compact('reservations'));
     }
 
-    /**
-     * Step 1: Form pemesanan awal
-     */
+ 
     public function showCreateReservation($id)
     {
         $room = Room::findOrFail($id);
@@ -99,9 +86,6 @@ public function index()
         return view('private.guest.reservation.create.phase1', compact('room'));
     }
 
-    /**
-     * Step 1: Simpan data awal reservasi ke session
-     */
     public function storePhaseOne(StoreReservationPhaseOneRequest $request)
     {
         $validated = $request->validated();
@@ -114,9 +98,7 @@ public function index()
         return redirect()->route('guest.reservations.create2', $validated['room_id']);
     }
 
-    /**
-     * Step 2: Tampilkan detail dan total biaya
-     */
+ 
     public function showCreatePhaseTwo($id)
     {
         $reservation = session('reservation');
@@ -148,9 +130,7 @@ public function index()
         return view('private.guest.reservation.create.phase2', compact('room', 'reservation'));
     }
 
-    /**
-     * Step 2: Simpan reservasi ke database
-     */
+
     public function storeReservation(Request $request)
     {
         DB::beginTransaction();
@@ -169,7 +149,6 @@ public function index()
                 'status'               => 'pending',
             ]);
 
-            // Update status kamar
             $request->room_id && Room::whereKey($request->room_id)->update(['room_status' => 'booked']);
 
             DB::commit();
@@ -191,7 +170,6 @@ public function index()
 {
     $user = auth()->user();
 
-    // Ambil semua reservasi milik user dengan relasi ke room
     $reservations = \App\Models\Reservation::with('room')
         ->where('user_id', $user->id)
         ->latest()
@@ -200,11 +178,6 @@ public function index()
     return view('private.guest.reservation.index', compact('reservations'));
 }
 
-
-
-    /**
-     * Tampilkan bukti reservasi
-     */
     public function showReceipt($id)
     {
         $reservation = Reservation::with('room')->findOrFail($id);
@@ -212,14 +185,11 @@ public function index()
         return view('private.guest.reservation.create.receipt', compact('reservation'));
     }
 
-    /**
-     * Tampilkan profil tamu
-     */
+
     public function showProfile()
     {
         $user = auth()->user()->load('profile');
 
-        // Handle jika profil belum ada
         $profile = $user->profile ?? (object) [
             'phone_number' => null,
             'address'      => null,
@@ -229,9 +199,7 @@ public function index()
         return view('private.guest.reservation.profile', compact('user', 'profile'));
     }
 
-    /**
-     * Update profil tamu
-     */
+
     public function updateProfile(Request $request)
     {
         $validated = $request->validate([

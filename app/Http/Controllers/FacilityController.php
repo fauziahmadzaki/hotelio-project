@@ -9,9 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class FacilityController extends Controller
 {
-    /**
-     * Tampilkan semua fasilitas
-     */
+
     public function index()
     {
         $facilities = Facility::orderBy('created_at', 'desc')->get();
@@ -19,17 +17,11 @@ class FacilityController extends Controller
         return view('private.admin.facilities.index', compact('facilities'));
     }
 
-    /**
-     * Form tambah fasilitas
-     */
     public function create()
     {
         return view('private.admin.facilities.create');
     }
 
-    /**
-     * Simpan fasilitas baru
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
