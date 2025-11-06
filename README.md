@@ -47,3 +47,7 @@ Aplikasi ini dirancang agar mudah digunakan, mobile-friendly, dan memiliki tampi
 ```bash
 git clone https://github.com/username/hotelio.git
 cd hotelio
+
+```bash
+composer install
+npm install
