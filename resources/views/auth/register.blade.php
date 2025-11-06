@@ -14,7 +14,7 @@
             error="{{ $errors->first('password') }}"></x-input-group>
         <x-input-group id="confirmPassword" label="Konfirmasi Password" placeholder="********" type="password"
             error="{{ $errors->first('confirmPassword') }}"></x-input-group>
-        <x-button type="submit" class="w-full text-white">Login</x-button>
+        <x-button type="submit" class="w-full text-white bg-violet-500">Register</x-button>
     </form>
     <p class="text-center text-sm">Sudah punya akun? <a href="{{ route('login') }}"
             class="font-semibold text-violet-500">Login</a></p>

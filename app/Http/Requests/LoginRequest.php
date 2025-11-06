@@ -23,7 +23,7 @@ class LoginRequest extends FormRequest
     {
         return [
             //
-            'email' => 'required|email',
+            'email' => 'required',
             'password' => 'required|min:3|max:32',
         ];
     }
@@ -32,7 +32,7 @@ class LoginRequest extends FormRequest
         return [
             
             'email.required' => 'Email harus diisi!',
-            'email.email' => 'Format email tidak valid!',
+
             'password.required' => 'Password harus diisi!',
             'password.min' => 'Password minimal 8 karakter!',
             'password.max' => 'Password maksimal 32 karakter!',

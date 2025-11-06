@@ -31,6 +31,8 @@ class StoreRoomRequest extends FormRequest
             'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'room_capacity' => 'nullable|integer|min:1',
             'room_description' => 'nullable|string|max:500',
+            'facilities' => 'array',
+        'room_status' => 'nullable|in:available,booked,maintenance',
         ];
     }
 

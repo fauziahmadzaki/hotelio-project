@@ -4,6 +4,8 @@ use Illuminate\Foundation\Application;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\EnsureReservationInProgress;
+use App\Http\Middleware\EnsureReservationStepOneComplete;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,7 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'role' => RoleMiddleware::class 
+            'role' => RoleMiddleware::class,
+            'reservation.inprogress' => EnsureReservationInProgress::class,
+            
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

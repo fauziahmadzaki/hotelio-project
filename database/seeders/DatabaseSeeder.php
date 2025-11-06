@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Database\Seeders\RoomSeeder;
+use Database\Seeders\FacilitySeeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
@@ -18,11 +20,17 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
+        User::create([
             'name' => 'admin',
-            'email' => 'fauziahmadzaki7@gmail.com',
             'password' => Hash::make('admin'),
             'role' => 'admin'
+        ]);
+
+        User::factory(20)->create();
+
+        $this->call([
+            FacilitySeeder::class,
+            RoomSeeder::class
         ]);
     }
 }

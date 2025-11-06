@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\Room;
+use App\Models\Facility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreRoomRequest;
@@ -18,12 +19,14 @@ class RoomController extends Controller
     }
 
     public function create(){
-        return view('private.admin.room.create');
+
+        return view('private.admin.room.create', ['facilities'=>Facility::all()]);
     }
 
     public function detail($id){
+        
         return view('private.admin.room.detail', [
-            'room' => Room::find($id)
+            'room' => Room::find($id), 'facilities' => Facility::all()
         ]);
     }
 
@@ -34,23 +37,23 @@ public function store(StoreRoomRequest $request)
     DB::beginTransaction();
 
     try {
-        // Simpan file gambar
-        // dd($request->file('image'));
+       
        $image = $request->file('image')
     ->storeAs('images', time().'.'.$request->file('image')->extension(), 'public');
-
        
-       
-
-        // Simpan data kamar
-        Room::create([
+       $room =  Room::create([
             'room_name'        => $validated['room_name'],
             'room_code'        => $validated['room_code'],
             'room_description' => $validated['room_description'],
             'room_capacity'    => $validated['room_capacity'],
             'room_price'       => $validated['room_price'],
             'image'            => $image,
+            'room_status'           => 'available',
         ]);
+
+        if ($request->filled('facilities')) {
+        $room->facilities()->sync($request->facilities);
+    }
 
         DB::commit();
 
@@ -60,7 +63,6 @@ public function store(StoreRoomRequest $request)
     } 
     catch (Exception $e) {
         DB::rollBack();
-        // Log error biar mudah di-debug
         
         return redirect()
             ->back()
@@ -70,23 +72,91 @@ public function store(StoreRoomRequest $request)
 }
 
    
+
+public function update(Request $request, $id)
+{
+    $room = Room::findOrFail($id);
+
+    // Validasi input
+    $validated = $request->validate([
+        'room_name' => 'required|string|max:255',
+        'room_code' => 'required|string|max:50|unique:rooms,room_code,' . $room->id,
+        'room_description' => 'nullable|string',
+        'room_capacity' => 'required|integer|min:1',
+        'room_price' => 'required|numeric|min:0',
+        'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        'facilities' => 'array',
+        'room_status' => 'nullable|in:available,booked,maintenance',
+        
+    ]);
+
+    try {
+        \DB::beginTransaction();
+
+        // Jika ada file gambar baru, simpan & hapus yang lama
+        if ($request->hasFile('image')) {
+            // hapus gambar lama
+            if ($room->image && \Storage::disk('public')->exists($room->image)) {
+                \Storage::disk('public')->delete($room->image);
+            }
+
+            // simpan gambar baru
+            $validated['image'] = $request->file('image')->storeAs(
+                'images',
+                time() . '.' . $request->file('image')->extension(),
+                'public'
+            );
+        }
+
+        // Update data kamar
+        $room->update($validated);
+
+        
+        if ($request->filled('facilities')) {
+            $room->facilities()->sync($request->facilities);
+        } else {
+            $room->facilities()->detach(); // kalau semua fasilitas dihapus
+        }
+
+        \DB::commit();
+
+        return redirect()
+            ->route('admin.rooms.index')
+            ->with('success', 'Data kamar berhasil diperbarui!');
+    } catch (\Exception $e) {
+        \DB::rollBack();
+        report($e);
+        return redirect()
+            ->back()
+            ->withInput()
+            ->with('error', 'Terjadi kesalahan saat memperbarui data kamar.');
+    }
+}
+
+public function showRoomDetail($id)
+{
+    $room = \App\Models\Room::with('facilities')->findOrFail($id);
+
+    return view('private.guest.detail', [
+        'title' => 'Detail Kamar - ' . $room->room_name,
+        'room' => $room,
+    ]);
+}
+
+
+
 public function destroy($id)
 {
     $room = Room::find($id);
-
-    // Jika data tidak ditemukan
     if (! $room) {
         return redirect()->back()->with('error', 'Data kamar tidak ditemukan!');
     }
 
-    // Hapus gambar jika ada dan file-nya masih tersimpan
     if ($room->image && Storage::disk('public')->exists($room->image)) {
-       Storage::delete($room->image);
+        Storage::disk('public')->delete($room->image);
     }
 
-    // Hapus data kamar dari database
     $room->delete();
-
     return redirect()
         ->back()
         ->with('success', 'Data kamar berhasil dihapus!');

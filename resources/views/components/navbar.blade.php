@@ -1,77 +1,86 @@
-<header class="w-full fixed lg:top-5">
-    <nav
-        class="max-w-5xl lg:p-5  lg:px-20 bg-white mx-auto lg:rounded-lg shadow-md lg:border border-gray-200 lg:flex justify-between items-center">
-        <div class="p-5 lg:p-0 flex w-full lg:w-fit justify-between border-b border-gray-200 lg:border-none">
-            <h1 class="text-xl font-bold text-violet-500 ">Hotelio</h1>
-            <button id="openBtn" class="lg:hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+<header class="w-full fixed top-0 left-0 z-50 bg-white/90 backdrop-blur border-b border-gray-200">
+    <nav class="max-w-6xl mx-auto flex items-center justify-between px-6 py-3 lg:px-10 lg:py-4">
+        {{-- Logo --}}
+        <div class="flex items-center justify-between w-full lg:w-fit">
+            <a href="/" class="flex items-center gap-2">
+                {{-- SVG LOGO --}}
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-menu-icon lucide-menu">
-                    <path d="M4 5h16" />
-                    <path d="M4 12h16" />
-                    <path d="M4 19h16" />
+                    class="text-violet-600">
+                    <path d="M3 9l9-6 9 6v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
                 </svg>
-            </button>
-            <button id="closeBtn" class="hidden lg:hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                <h1 class="text-xl font-bold text-violet-600">Hotelio</h1>
+            </a>
+
+            {{-- Tombol Menu Mobile --}}
+            <button id="menu-toggle" class="lg:hidden">
+                <svg id="menu-open" xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-x-icon lucide-x">
-                    <path d="M18 6 6 18" />
-                    <path d="m6 6 12 12" />
+                    class="text-gray-700">
+                    <path d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                <svg id="menu-close" xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="hidden text-gray-700">
+                    <path d="M18 6 6 18M6 6l12 12" />
                 </svg>
             </button>
         </div>
-        <ul id="menu" class="max-h-0 lg:max-h-fit  text-center overflow-hidden  transition-all  duration-700">
-            <div class="space-y-5 lg:space-y-0 lg:flex items-center gap-5 p-5 lg:p-0">
-                <li>
-                    <a href="/" class="hover:text-violet-500">Home</a>
-                </li>
-                <li>
-                    <a href="/rooms" class="hover:text-violet-500">Rooms</a>
-                </li>
-                <li>
-                    <a href="/about" class="hover:text-violet-500">About</a>
-                </li>
-                <li>
-                    <a href="/contact" class="hover:text-violet-500">Contact</a>
-                </li>
-                <li class="space-y-2 lg:hidden">
+
+        {{-- Menu Navigasi --}}
+        <ul id="nav-menu"
+            class="absolute top-full left-0 w-full bg-white lg:bg-transparent shadow-md border-b border-gray-200 overflow-hidden max-h-0 transition-all duration-500 ease-in-out lg:relative lg:max-h-fit lg:shadow-none lg:border-none lg:flex lg:items-center lg:gap-8 lg:w-auto">
+            <div class="flex flex-col items-center lg:flex-row lg:gap-8 p-5 lg:p-0 text-gray-700">
+                <li><a href="#home" class="hover:text-violet-600 transition">Home</a></li>
+                <li><a href="#rooms" class="hover:text-violet-600 transition">Rooms</a></li>
+                <li><a href="#about" class="hover:text-violet-600 transition">About</a></li>
+                <li><a href="#contact" class="hover:text-violet-600 transition">Contact</a></li>
+
+                {{-- Tombol Mobile --}}
+                <li class="mt-5 lg:hidden w-full space-y-2">
                     @guest
-                    <x-button class="text-white w-full"><a href="{{ route('login') }}">Login</a></x-button>
-                    <x-button class=" text-violet-500 bg-white border border-violet-500 w-full"><a
-                            href="{{ route('login') }}">Register</a></x-button>
+                    <x-button class="w-full bg-violet-600 text-white"><a href="{{ route('login') }}">Login</a>
+                    </x-button>
+                    <x-button class="w-full border border-violet-600 text-violet-600 bg-white"><a
+                            href="{{ route('register') }}">Register</a></x-button>
                     @endguest
                     @auth
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        <x-button class="text-white w-full">Logout</x-button>
+                        <x-button class="w-full bg-violet-600 text-white">Logout</x-button>
                     </form>
                     @endauth
                 </li>
             </div>
         </ul>
-        <div class="hidden lg:flex gap-2">
+
+        {{-- Tombol Desktop --}}
+        <div class="hidden lg:flex gap-3">
             @guest
-            <x-button class="text-white"><a href="{{ route('login') }}">Login</a></x-button>
+            <x-button class="bg-violet-600 text-white"><a href="{{ route('login') }}">Login</a></x-button>
+            <x-button class="border border-violet-600 text-violet-600 bg-white"><a
+                    href="{{ route('register') }}">Register</a></x-button>
             @endguest
+            @auth
+            <x-dashboard-button></x-dashboard-button>
+            @endauth
         </div>
     </nav>
 </header>
 
+{{-- Script --}}
 <script>
-    const openBtn = document.getElementById('openBtn');
-    const closeBtn = document.getElementById('closeBtn');
-    const menu = document.getElementById('menu');
-    openBtn.addEventListener('click', () => {
-        menu.classList.remove('max-h-0');
-        menu.classList.add('max-h-96');
-        openBtn.classList.add('hidden');
-        closeBtn.classList.remove('hidden');
-    })
-    closeBtn.addEventListener('click', () => {
-        menu.classList.add('max-h-0');
-        menu.classList.remove('max-h-96');
-        openBtn.classList.toggle('hidden');
-        closeBtn.classList.toggle('hidden');
-    })
+    const toggle = document.getElementById('menu-toggle');
+    const menu = document.getElementById('nav-menu');
+    const openIcon = document.getElementById('menu-open');
+    const closeIcon = document.getElementById('menu-close');
+
+    toggle.addEventListener('click', () => {
+        const isOpen = menu.classList.contains('max-h-96');
+        menu.classList.toggle('max-h-0', isOpen);
+        menu.classList.toggle('max-h-96', !isOpen);
+        openIcon.classList.toggle('hidden', !isOpen);
+        closeIcon.classList.toggle('hidden', isOpen);
+    });
 </script>

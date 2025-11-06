@@ -1,43 +1,52 @@
-@props(['title', 'price' => null, 'img' => null, 'id' => ''])
+@props(['title', 'price' => null, 'img' => null, 'id' => '', 'status' => null])
 
-<div class="rounded-lg overflow-hidden w-xs h-full bg-white shadow-md">
-    {{-- Gambar --}}
-    <img src="{{ asset('storage/'.$img) }}" alt="{{ $title }}" class="h-52 w-full object-cover bg-gray-200">
+<div
+    class="rounded-xl overflow-hidden bg-white shadow-md hover:shadow-lg transition-all duration-200 flex flex-col h-full w-full sm:w-64">
+
+    {{-- Gambar kamar --}}
+    <div class="relative">
+        <img src="{{ asset('storage/' . $img) }}" alt="{{ $title }}" class="h-48 w-full object-cover bg-gray-100">
+        {{-- Status badge --}}
+        @if ($status)
+        <span class="absolute top-2 right-2 px-3 py-1 text-xs font-semibold rounded-full
+                @if ($status === 'available') bg-green-100 text-green-600
+                @elseif ($status === 'booked') bg-yellow-100 text-yellow-600
+                @else bg-red-100 text-red-600
+                @endif">
+            {{ ucfirst($status) }}
+        </span>
+        @endif
+    </div>
 
     {{-- Isi Card --}}
-    <div class="flex flex-col justify-between p-3">
+    <div class="flex flex-col justify-between flex-1 p-4 space-y-2">
         <div>
-            <h1 class="text-lg font-bold">{{ $title }}</h1>
+            <h1 class="text-lg font-bold text-gray-800">{{ $title }}</h1>
             @if($price)
-            <p class="text-gray-600">{{ number_format($price, 0, ',', '.') }}</p>
+            <p class="text-violet-600 font-semibold text-sm">
+                Rp {{ number_format($price, 0, ',', '.') }} <span class="text-gray-500 font-normal">/ malam</span>
+            </p>
             @endif
         </div>
 
-        {{-- Tombol Aksi --}}
-        <div class="flex w-full gap-2 mt-3">
-            {{-- Tombol Manage pakai <a> langsung --}}
-            <a href="{{ $id }}"
-                class="w-full text-center rounded-md bg-violet-500 text-white font-semibold py-2 hover:bg-violet-600 transition-colors">
-                Manage
+        {{-- Tombol aksi --}}
+        <div class="flex flex-col sm:flex-row gap-2 mt-3">
+            <a href="{{ route('room.detail', $id) }}"
+                class="w-full text-center rounded-md border border-violet-500 text-violet-600 font-semibold py-2 hover:bg-violet-50 transition">
+                Lihat Detail
             </a>
 
-            {{-- Tombol Delete pakai form POST --}}
-            <form action="{{ url('/admin/rooms/destroy/' . $id) }}" method="DELETE" class="w-full">
-                @csrf
-                @method('DELETE')
-                <button type="submit"
-                    class="w-full flex justify-center items-center rounded-md bg-red-500 text-white py-2 hover:bg-red-600 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="lucide lucide-trash2-icon lucide-trash-2">
-                        <path d="M10 11v6" />
-                        <path d="M14 11v6" />
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-                        <path d="M3 6h18" />
-                        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                    </svg>
-                </button>
-            </form>
+            @if ($status == 'available')
+            <a href="{{ route('guest.reservations.create1', $id) }}"
+                class="w-full text-center rounded-md bg-violet-600 text-white font-semibold py-2 hover:bg-violet-700 transition">
+                Booking
+            </a>
+            @else
+            <button disabled
+                class="w-full text-center rounded-md bg-gray-300 text-white font-semibold py-2 cursor-not-allowed">
+                Tidak Tersedia
+            </button>
+            @endif
         </div>
     </div>
 </div>
