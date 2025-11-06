@@ -1,5 +1,6 @@
 <x-layout>
-    <x-card.index class="max-w-3xl mx-auto space-y-6 p-6">
+    <x-navbar></x-navbar>
+    <x-card.index class="max-w-3xl mx-auto space-y-6 p-6 mt-30">
         {{-- Gambar utama --}}
         <div class="flex flex-col sm:flex-row gap-5">
             <div class="w-full sm:w-1/2">

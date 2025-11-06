@@ -52,4 +52,7 @@ class ReservationService{
         ];
         return $colors[$status] ?? $colors['pending'];
     }
+
+  
 }
+

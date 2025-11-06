@@ -1,6 +1,6 @@
 <x-receptionist.layout>
     <x-card class="max-w-xl">
-        <form action="{{ route('receptionist.reservation.store') }}" method="POST" class="space-y-3">
+        <form action="{{ route('receptionist.reservations.store') }}" method="POST" class="space-y-3">
             @csrf
             <x-input-group id="person_name" placeholder="John Doe" label="Nama" type="text"
                 value="{{ old('person_name') }}" error="{{ $errors->first('person_name') }}"></x-input-group>
@@ -35,7 +35,7 @@
                 <select name="status" value="{{ old('status') ?? 'pending' }}"
                     class="w-fit border border-gray-200 rounded-lg p-2">
                     <option value="pending">Pending</option>
-                    <option value="confirmed">Confirmed</option>
+                    <option value="checked_in">Check-in</option>
                 </select>
             </div>
             <x-button type="submit" class="w-full bg-violet-500 text-white">Buat</x-button>

@@ -1,6 +1,7 @@
 <x-admin.layout>
-    <x-card class="max-w-xl">
-        <form action="{{ route('admin.reservations.update', $reservation->id) }}" method="POST" class="space-y-3">
+    <x-card class="max-w-xl mx-auto">
+        <h1 class="text-xl font-bold">Edit Reservasi</h1>
+        <form action="{{ route('admin.reservations.update', $reservation) }}" method="POST" class="space-y-3">
             @csrf
             @method('PUT')
 
@@ -15,15 +16,6 @@
                 error="{{ $errors->first('person_phone_number') }}" />
 
             {{-- Check-in & Check-out --}}
-            <div class="flex gap-4 w-full items-end">
-                <x-input-group id="check_in_date" label="Tanggal Checkin" type="date"
-                    value="{{ old('check_in_date', $reservation->check_in_date) }}"
-                    error="{{ $errors->first('check_in_date') }}" />
-
-                <x-input-group id="check_out_date" label="Tanggal Checkout" type="date"
-                    value="{{ old('check_out_date', $reservation->check_out_date) }}"
-                    error="{{ $errors->first('check_out_date') }}" />
-            </div>
 
             {{-- Jumlah Tamu --}}
             <x-input-group id="total_guests" placeholder="1" label="Jumlah Orang" type="number"
@@ -55,7 +47,7 @@
                 <x-error>{{ $message }}</x-error>
                 @enderror
                 <select name="status" class="border border-gray-200 rounded-lg p-2 w-full">
-                    @foreach (['pending', 'confirmed', 'cancelled', 'checked_in', 'completed'] as $status)
+                    @foreach (['pending', 'cancelled', 'checked_in', 'completed'] as $status)
                     @if ($reservation->status === $status)
                     <option value="{{ $status }}" selected>
                         {{ ucfirst(str_replace('_', ' ', $status)) }}

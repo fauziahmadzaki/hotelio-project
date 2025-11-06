@@ -1,6 +1,6 @@
 <x-admin.layout>
     <x-card.index class="max-w-2xl mx-auto p-6 space-y-6">
-        <h1 class="text-2xl font-semibold text-gray-800 border-b pb-2">Tambah Kamar</h1>
+        <h1 class="text-2xl font-semibold text-gray-800  pb-2">Tambah Kamar</h1>
 
         <form action="{{ route('admin.rooms.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf

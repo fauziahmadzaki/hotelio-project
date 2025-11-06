@@ -49,7 +49,7 @@ Route::middleware(['auth', 'role:user,admin'])
         Route::controller(AdminController::class)->group(function () {
             Route::get('/', 'index')->name('dashboard');
             Route::get('/users', 'users')->name('users');
-            Route::put('/users/{user}/update-role', 'updateUserRole')->name('users.updateRole');
+            Route::patch('/users/{user}/update-role', 'updateUserRole')->name('users.updateRole');
         });
 
         // Rooms Controller Group
@@ -110,9 +110,11 @@ Route::middleware(['auth', 'role:receptionist,admin'])
             Route::get('/reservations', 'listReservations')->name('reservations.index');
             Route::get('/reservations',  'reservations')->name('reservations.index');
             Route::patch('/reservations/{id}',  'updateReservationStatus')->name('reservations.update');
+            Route::get('/reservations/create', 'create')->name('reservations.create');
+            Route::post('/reservations', 'storeReservation')->name('reservations.store');
+            
         });
-            Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservation.create');
-            Route::post('/reservations/store', [ReservationController::class, 'store'])->name('reservation.store');
+            
 
     });
 

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreReservationRequest;
+use App\Http\Requests\UpdateReservationRequest;
 
 class ReservationController extends Controller
 {
@@ -92,27 +93,32 @@ class ReservationController extends Controller
         return view('private.admin.reservations.edit', compact('reservation', 'rooms'));
     }
 
-    public function update(StoreReservationRequest $request, Reservation $reservation)
-    {
-        $validated = $request->validated();
-        DB::beginTransaction();
-        try {
-            $reservation->update($validated);
-            if($request->status == 'cancel' || $request->status == 'completed'){
-            $room = Room::where('id', $reservation->room_id)->update([
+public function update(UpdateReservationRequest $request, Reservation $reservation)
+{
+    $validated = $request->validated();
+    DB::beginTransaction();
+
+    try {
+        $reservation->update($validated);
+
+        if (in_array($validated['status'], ['cancel', 'completed'])) {
+            Room::where('id', $reservation->room_id)->update([
                 'room_status' => 'available'
             ]);
-            $reservation->update($validated);
-            DB::commit();
-            return redirect()->route('admin.reservations.index')->with('success', 'Status reservasi diperbarui.');
-        }//code...
-        } catch (\Throwable $th) {
-            //throw $th;
-            DB::rollBack();
-            return back()->with('error', 'Gagal memperbarui reservasi: '.$th->getMessage());
         }
-        return redirect()->back()->with('success', 'Status reservasi diperbarui.');
+
+        DB::commit();
+        
+        if(Auth::user()->role == 'receptionist'){
+            return redirect()->route('receptionist.reservations.index')->with('success', 'Reservasi berhasil diperbarui.');
+        }else{
+            return redirect()->route('admin.reservations.index')->with('success', 'Reservasi berhasil diperbarui.');
+        }
+    } catch (\Throwable $th) {
+        DB::rollBack();
+        return back()->with('error', 'Gagal memperbarui reservasi: '.$th->getMessage());
     }
+}
 
     /**
      * Hapus reservasi.

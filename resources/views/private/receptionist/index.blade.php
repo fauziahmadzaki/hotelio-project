@@ -4,7 +4,7 @@
         <h1 class="text-2xl font-bold text-gray-800">Dashboard Resepsionis 👋</h1>
 
         {{-- Statistik Utama --}}
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div class="grid grid-cols-1  lg:grid-cols-3 gap-4">
             <x-card class="p-4 border-l-4 border-violet-500">
                 <h2 class="text-gray-600 text-sm font-medium">Total Tamu</h2>
                 <p class="text-3xl font-bold text-violet-600">{{ $totalGuests }}</p>

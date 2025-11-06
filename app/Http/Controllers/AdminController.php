@@ -30,7 +30,7 @@ class AdminController extends Controller
             ->pluck('count', 'status');
 
         $pending   = $statusCounts['pending'] ?? 0;
-        $confirmed = $statusCounts['confirmed'] ?? 0;
+        $confirmed = $statusCounts['checked_in'] ?? 0;
         $cancelled = $statusCounts['cancelled'] ?? 0;
         $completed = $statusCounts['completed'] ?? 0;
 
@@ -104,4 +104,9 @@ public function updateUserRole(Request $request, User $user)
     return redirect()->route('admin.users')->with('success', "Role {$user->name} berhasil diubah!");
 }
 
+public function destroy(User $user)
+{
+    $user->delete();
+    return redirect()->route('admin.users')->with('success', "User  berhasil dihapus!");
+}
 }

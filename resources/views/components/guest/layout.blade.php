@@ -158,7 +158,7 @@
 
                     const data = await res.json();
                     this.stats[0].value = data.pending ?? 0;
-                    this.stats[1].value = data.confirmed ?? 0;
+                    this.stats[1].value = data.pending ?? 0;
                     this.stats[2].value = data.cancelled ?? 0;
                     this.latest = data.latest;
                 } catch (error) {

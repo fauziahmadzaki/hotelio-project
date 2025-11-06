@@ -34,7 +34,7 @@
                 <h2 class="text-2xl font-bold text-yellow-600">{{ $pending }}</h2>
             </x-card>
             <x-card class="p-4 text-center">
-                <p class="text-sm text-gray-600">Terkonfirmasi</p>
+                <p class="text-sm text-gray-600">Sedang Checkin</p>
                 <h2 class="text-2xl font-bold text-green-600">{{ $confirmed }}</h2>
             </x-card>
             <x-card class="p-4 text-center">

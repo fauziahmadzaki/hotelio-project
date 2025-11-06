@@ -35,7 +35,7 @@
                 <select name="status" value="{{ old('status') ?? 'pending' }}"
                     class="w-fit border border-gray-200 rounded-lg p-2">
                     <option value="pending">Pending</option>
-                    <option value="confirmed">Confirmed</option>
+                    <option value="checked_in">Check-in</option>
                 </select>
             </div>
             <x-button type="submit" class="w-full bg-violet-500 text-white">Buat</x-button>
