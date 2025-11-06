@@ -80,12 +80,11 @@ php artisan key:generate
 php artisan migrate --seed
 ```
 Seeder akan membuat:
+Admin default:
 
-- Admin default:
+ - Username : admin
 
- -- Username : admin
-
- -- Password: admin
+ - Password: admin
 
 ### 6️⃣ Jalankan Server
 ```bash
