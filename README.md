@@ -119,8 +119,7 @@ app/
 ```
 
 ### 🧑‍💻 Kontributor
-Nama	Peran
-[Fauzi Ahmad Zaki]	Fullstack Developer
+Fauzi Ahmad Zaki	Fullstack Developer
 
 
 ### ❤️ Kredit
