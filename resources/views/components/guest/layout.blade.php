@@ -1,172 +1,138 @@
 <x-layout>
-    <x-slot:title>{{ $title ?? 'Dashboard' }}</x-slot:title>
+    <x-slot:title>{{ $title ?? "Dashboard" }}</x-slot:title>
 
-    {{-- Navbar --}}
-    <nav class="p-4 bg-white fixed w-full border-b top-0 border-gray-200 flex items-center justify-between z-50">
-        {{-- Tombol toggle sidebar (mobile) --}}
-        <button id="sidebarToggle" class="lg:hidden text-gray-600 focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.75h16.5M3.75 12h16.5m-16.5 6.25h16.5" />
-            </svg>
-        </button>
+    {{-- 🔹 Navbar --}}
+    <nav
+        class="fixed top-0 left-0 w-full bg-white border-b border-gray-200 shadow-sm z-40 flex justify-between items-center px-5 py-3">
+        {{-- Brand --}}
+        <h1 class="font-bold text-violet-600 text-lg">Hotelio Guest</h1>
 
-        {{-- Judul --}}
-        <h1 class="font-semibold text-lg text-violet-600">Dashboard Tamu</h1>
+        {{-- Bagian kanan --}}
+        <div class="flex items-center gap-4">
+            {{-- Profil --}}
+            <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open" class="flex items-center gap-2 focus:outline-none">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=7c3aed&color=fff"
+                        alt="Avatar {{ Auth::user()->name }}" class="w-8 h-8 rounded-full shadow-sm">
+                    <span class="hidden sm:block font-medium text-gray-700">{{ Auth::user()->name }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-500 hidden sm:block" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
 
-        {{-- Profil kanan --}}
-        <div class="relative">
-            <button id="profileButton" class="flex items-center gap-3 focus:outline-none">
-                <span class="hidden sm:block text-gray-700 font-medium">{{ auth()->user()->name ?? 'Tamu' }}</span>
-                <div
-                    class="w-9 h-9 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center font-semibold uppercase">
-                    {{ substr(auth()->user()->name ?? 'T', 0, 1) }}
+                {{-- Dropdown --}}
+                <div x-show="open" @click.away="open = false"
+                    class="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-md py-2 z-50">
+                    <a href="{{ route('guest.profile.show') }}"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profil Saya</a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit"
+                            class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">Keluar</button>
+                    </form>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-chevron-down text-gray-500">
-                    <path d="m6 9 6 6 6-6" />
+            </div>
+
+            {{-- Tombol toggle sidebar (mobile) --}}
+            <button id="menu-toggle" class="lg:hidden p-2 rounded-md hover:bg-gray-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
-
-            {{-- Dropdown menu --}}
-            <div id="profileMenu"
-                class="hidden absolute right-0 mt-2 w-44 bg-white rounded-md shadow-lg border border-gray-100 py-2 z-50">
-                <a href="{{ route('guest.profile.show') }}"
-                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profil Saya</a>
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Pengaturan</a>
-                <hr class="my-1 border-gray-200">
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit"
-                        class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                        Logout
-                    </button>
-                </form>
-            </div>
         </div>
     </nav>
 
-    {{-- Overlay (untuk mobile) --}}
-    <div id="overlay" class="fixed inset-0 bg-black/40 z-30 hidden lg:hidden transition-opacity duration-300"></div>
-
-    {{-- Sidebar --}}
+    {{-- 🔹 Sidebar --}}
     <aside id="sidebar"
-        class="fixed top-0 left-0 z-40 bg-white w-64 h-svh py-5 border-r border-gray-200 shadow-sm flex flex-col transform transition-transform duration-300 -translate-x-full lg:translate-x-0">
-        <div class="mb-6">
-            <h1 class="text-lg text-center font-semibold text-violet-500">Dashboard</h1>
-        </div>
+        class="fixed top-[56px] left-0 z-30 bg-white w-64 h-[calc(100vh-56px)] border-r border-gray-200 shadow-sm flex flex-col justify-between transform -translate-x-full lg:translate-x-0 transition-transform duration-200">
 
-        <ul class="flex flex-col items-center mt-8 gap-5">
-            <x-guest.navlink :active="request()->routeIs('guest.dashboard')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-layout-dashboard">
-                    <rect width="7" height="9" x="3" y="3" rx="1" />
-                    <rect width="7" height="5" x="14" y="3" rx="1" />
-                    <rect width="7" height="9" x="14" y="12" rx="1" />
-                    <rect width="7" height="5" x="3" y="16" rx="1" />
-                </svg>
-                <a href="{{ route('guest.dashboard') }}">Dashboard</a>
-            </x-guest.navlink>
+        <div class="flex flex-col justify-between h-full border-e border-gray-100 bg-white">
+            <div class="px-4 py-6">
+                <ul class="mt-6 space-y-1">
+                    {{-- Dashboard --}}
+                    <li>
+                        <x-guest.navlink href="{{ route('guest.dashboard') }}"
+                            :active="request()->routeIs('guest.dashboard')">
+                            Dashboard
+                        </x-guest.navlink>
+                    </li>
 
-            <x-guest.navlink :active="request()->is('dashboard/reservation*')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-concierge-bell">
-                    <path d="M3 20a1 1 0 0 1-1-1v-1a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1Z" />
-                    <path d="M20 16a8 8 0 1 0-16 0" />
-                    <path d="M12 4v4" />
-                    <path d="M10 4h4" />
-                </svg>
-                <a href="{{ route('guest.reservations.index') }}">Reservasi Saya</a>
-            </x-guest.navlink>
+                    {{-- Reservasi Saya --}}
+                    <li>
+                        <x-guest.navlink href="{{ route('guest.reservations.index') }}"
+                            :active="request()->is('dashboard/reservation*')">
+                            Reservasi Saya
+                        </x-guest.navlink>
+                    </li>
 
-            <x-guest.navlink :active="request()->is('dashboard/profile*')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings">
-                    <path
-                        d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
-                    <circle cx="12" cy="12" r="3" />
-                </svg>
-                <a href="{{ route('guest.profile.show') }}">Pengaturan</a>
-            </x-guest.navlink>
-        </ul>
+                    {{-- Pengaturan (dropdown) --}}
 
-        <div class="p-5 text-center text-xs text-gray-400 border-t border-gray-100">
-            &copy; {{ date('Y') }} <span class="text-violet-500 font-semibold">Hotelio</span>
+                    <details class="group [&amp;_summary::-webkit-details-marker]:hidden">
+                        <summary
+                            class="flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700">
+                            <span class="text-sm font-medium"> Akun </span>
+
+                            <span class="shrink-0 transition duration-300 group-open:-rotate-180">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                            </span>
+                        </summary>
+
+                        <ul class="mt-2 space-y-1 px-4">
+                            <li>
+                                <a href="{{ route('reset-password') }}"
+                                    class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
+                                    Reset Password
+                                </a>
+                            </li>
+
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit"
+                                        class="w-full rounded-lg px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 text-left">
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
+
+                        </ul>
+                    </details>
+                    </li>
+                    </li>
+                </ul>
+            </div>
+
+            {{-- Footer Sidebar --}}
+            <div class="border-t border-gray-100 p-4">
+                <div class="flex items-center gap-3">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=7c3aed&color=fff"
+                        alt="User avatar" class="size-9 rounded-full object-cover">
+                    <div>
+                        <p class="text-sm font-medium text-gray-700">{{ Auth::user()->name }}</p>
+                        <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </aside>
 
-    {{-- Konten utama --}}
-    <main class="lg:ml-64 mt-[56px] p-6 bg-gray-50 min-h-screen transition-all duration-200 space-y-5">
+    {{-- 🔹 Main Content --}}
+    <main class="lg:ml-64 mt-[56px] p-8 bg-gray-50 min-h-screen transition-all duration-200 space-y-5">
         {{ $slot ?? '' }}
     </main>
 
-    {{-- Script toggle sidebar & dropdown --}}
+    {{-- Alpine.js & Sidebar Toggle --}}
+    <script src="//unpkg.com/alpinejs" defer></script>
     <script>
-        const toggle = document.getElementById('sidebarToggle');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        const profileBtn = document.getElementById('profileButton');
-        const profileMenu = document.getElementById('profileMenu');
-
-        // Sidebar toggle
-        toggle.addEventListener('click', () => {
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        });
-
-        overlay.addEventListener('click', () => {
-            sidebar.classList.add('-translate-x-full');
-            overlay.classList.add('hidden');
-        });
-
-        // Dropdown menu toggle
-        profileBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            profileMenu.classList.toggle('hidden');
-        });
-
-        // Tutup dropdown jika klik di luar
-        window.addEventListener('click', (e) => {
-            if (!profileBtn.contains(e.target)) {
-                profileMenu.classList.add('hidden');
-            }
+        document.getElementById('menu-toggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
         });
     </script>
-
-
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-
-    <script>
-        window.dashboardData = function() {
-        return {
-            stats: [
-                { title: 'Kamar Dibooking', value: 0, color: 'border-violet-500', textColor: 'text-violet-600' },
-                { title: 'Belum Check-in', value: 0, color: 'border-yellow-500', textColor: 'text-yellow-600' },
-                { title: 'Dibatalkan', value: 0, color: 'border-red-500', textColor: 'text-red-600' },
-            ],
-            latest: null,
-
-            async fetchData() {
-                try {
-                    const res = await fetch('{{ route('guest.dashboard.data') }}', {
-                        headers: { 'Accept': 'application/json' }
-                    });
-                    if (!res.ok) throw new Error('Gagal memuat data');
-
-                    const data = await res.json();
-                    this.stats[0].value = data.pending ?? 0;
-                    this.stats[1].value = data.pending ?? 0;
-                    this.stats[2].value = data.cancelled ?? 0;
-                    this.latest = data.latest;
-                } catch (error) {
-                    console.error('❌ Error memuat data dashboard:', error);
-                }
-            }
-        };
-    };
-    </script>
-
 </x-layout>

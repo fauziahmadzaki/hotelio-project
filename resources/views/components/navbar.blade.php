@@ -32,8 +32,8 @@
         <ul id="nav-menu"
             class="absolute top-full left-0 w-full bg-white lg:bg-transparent shadow-md border-b border-gray-200 overflow-hidden max-h-0 transition-all duration-500 ease-in-out lg:relative lg:max-h-fit lg:shadow-none lg:border-none lg:flex lg:items-center lg:gap-8 lg:w-auto">
             <div class="flex flex-col items-center lg:flex-row lg:gap-8 p-5 lg:p-0 text-gray-700">
-                <li><a href="#home" class="hover:text-violet-600 transition">Home</a></li>
-                <li><a href="#rooms" class="hover:text-violet-600 transition">Rooms</a></li>
+                <li><a href="/" class="hover:text-violet-600 transition">Home</a></li>
+                <li><a href="/room" class="hover:text-violet-600 transition">Rooms</a></li>
                 <li><a href="#about" class="hover:text-violet-600 transition">About</a></li>
                 <li><a href="#contact" class="hover:text-violet-600 transition">Contact</a></li>
 

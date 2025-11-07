@@ -20,7 +20,7 @@
                     <th class="px-4 py-3 text-left font-semibold">Total Harga</th>
                     <th class="px-4 py-3 text-left font-semibold">Check-in</th>
                     <th class="px-4 py-3 text-left font-semibold">Check-out</th>
-                    <th class="px-4 py-3 text-left font-semibold">Status</th>
+
                     <th class="px-4 py-3 text-center font-semibold">Aksi</th>
                 </tr>
             </thead>
@@ -37,33 +37,16 @@
                     <td class="px-4 py-2">{{ \Carbon\Carbon::parse($item->check_out_date)->translatedFormat('d M Y') }}
                     </td>
 
-                    {{-- Kolom Status --}}
-                    <td class="px-4 py-2">
-                        <form action="{{ route('receptionist.reservations.update', $item->id) }}" method="POST"
-                            class="flex items-center gap-2">
-                            @csrf
-                            @method('PATCH')
-                            <select name="status"
-                                class="border-gray-300 rounded-md text-sm px-2 py-1 focus:ring-violet-500 focus:border-violet-500">
-                                <option value="pending" {{ $item->status === 'pending' ? 'selected' : '' }}>Pending
-                                </option>
-                                <option value="checked_in" {{ $item->status === 'checked_in' ? 'selected' : ''
-                                    }}>Checked In</option>
-                                <option value="cancelled" {{ $item->status === 'cancelled' ? 'selected' : ''
-                                    }}>Cancelled</option>
-                                <option value="completed" {{ $item->status === 'completed' ? 'selected' : ''
-                                    }}>Completed</option>
-                            </select>
-                            <button type="submit"
-                                class="rounded-md bg-violet-600 text-white px-3 py-1 text-xs font-medium hover:bg-violet-700 transition">
-                                Simpan
-                            </button>
-                        </form>
-                    </td>
 
+                    <td class="px-2 py-2">
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">
+                            {{ ucfirst($item->status) }}
+                        </span>
+
+                    </td>
                     {{-- Kolom Aksi --}}
                     <td class="px-4 py-2 text-center">
-                        <a href="{{ route('receptionist.reservations.show', $item->id ?? 0) }}" class="inline-block rounded-md border border-blue-600 bg-blue-600 px-3 py-1 text-white text-xs
+                        <a href="{{ route('receptionist.reservations.show', $item ?? 0) }}" class="inline-block rounded-md border border-blue-600 bg-blue-600 px-3 py-1 text-white text-xs
                         font-medium hover:bg-transparent hover:text-blue-600 transition">
                             Detail
                         </a>

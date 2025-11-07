@@ -32,6 +32,7 @@ class StoreReservationPhaseOneRequest extends FormRequest
         'check_in_date' => 'required|date|after_or_equal:today',
         'check_out_date' => 'required|date|after:check_in_date',
         'total_guests' => 'required|integer|min:1',
+        'notes' => 'nullable|max:500',
     ];
 }
 
@@ -63,6 +64,8 @@ public function messages(): array
         'total_guests.required' => 'Jumlah tamu wajib diisi.',
         'total_guests.integer' => 'Jumlah tamu harus berupa angka.',
         'total_guests.min' => 'Minimal 1 tamu.',
+
+        'notes.max' => 'Catatan maksimal 500 karakter.',
     ];
 }
 }

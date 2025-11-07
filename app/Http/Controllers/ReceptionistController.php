@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Room;
 use App\Models\User;
+use App\Models\Income;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -32,8 +33,7 @@ class ReceptionistController extends Controller
         $activeReservations = Reservation::whereIn('status', ['confirmed', 'checked_in'])->count();
 
         // Total pendapatan (dari status confirmed, checkin, completed)
-        $totalRevenue = Reservation::whereIn('status', ['confirmed', 'checked_in', 'completed'])
-            ->sum('total_price');
+         $totalRevenue = Income::where('type', 'income')->sum('amount');
 
         return view('private.receptionist.index', compact(
             'totalGuests',
@@ -57,27 +57,65 @@ class ReceptionistController extends Controller
         return view('private.receptionist.reservation.index', compact('reservations'));
     }
 
+
+    public function showActiveReservations()
+    {
+        $reservations =  Reservation::where('status', '!=', 'completed')->where('status', '!=', 'cancelled')->with(['room'])->latest()->get();
+        return view('private.receptionist.reservation.index', compact('reservations'));
+    }
+
+    public function showCompletedReservations(){
+        $reservations =  Reservation::where('status', 'completed')->with(['room'])->latest()->get();
+        return view('private.receptionist.reservation.completed', compact('reservations'));
+    }
+
+    public function showCancelledReservations(){
+        $reservations =  Reservation::where('status', 'cancelled')->with(['room'])->latest()->get();
+        return view('private.receptionist.reservation.cancelled', compact('reservations'));
+    }
+
+
     /**
      * Update status reservasi (confirm, checkin, complete, cancel)
      */
     public function updateReservationStatus(Request $request, $id)
-    {
-        $request->validate([
-            'status' => 'required|in:pending,confirmed,checkin,completed,cancelled',
-        ]);
+{
+    $request->validate([
+        'status' => 'required|in:pending,checked_in,cancelled,completed',
+    ]);
 
-        DB::beginTransaction();
-        try {
-            $reservation = Reservation::findOrFail($id);
-            $reservation->update(['status' => $request->status]);
-            DB::commit();
+    DB::beginTransaction();
+    try {
+        $reservation = Reservation::with('room')->findOrFail($id);
 
-            return back()->with('success', 'Status reservasi berhasil diperbarui!');
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            return back()->with('error', 'Gagal memperbarui status: ' . $th->getMessage());
+        // Update status reservasi
+        $reservation->update(['status' => $request->status]);
+
+        // 🔹 Update status kamar berdasarkan status reservasi
+       if (in_array($request->status, ['completed', 'cancelled'])) {
+            $reservation->room->update(['room_status' => 'available']);
         }
+
+        // 🔹 Jika status menjadi completed, buat record Income
+        if ($request->status === 'completed') {
+            \App\Models\Income::create([
+                'amount'         => $reservation->total_price,
+                'payment_method' => $reservation->payment_method ?? 'cash',
+                'type'           => 'income',
+                'date'           => now(),
+                'description'    => 'Reservasi #' . $reservation->id . ' - ' . ($reservation->room->room_name ?? 'Kamar'),
+                'category'       => 'rental',
+            ]);
+        }
+
+        DB::commit();
+        return back()->with('success', 'Status reservasi berhasil diperbarui!');
+    } catch (\Throwable $th) {
+        DB::rollBack();
+        return back()->with('error', 'Gagal memperbarui status: ' . $th->getMessage());
     }
+}
+
 
     public function create(){
         $rooms = Room::where('room_status', 'available')->get();
@@ -102,6 +140,8 @@ class ReceptionistController extends Controller
                 'total_guests' => $validated['total_guests'],
                 'total_price' => $totalPrice,
                 'status' => $validated['status'],
+                'payment_method' => $validated['payment_method'],
+                'notes' => $validated['notes'],
             ]);
             DB::commit();
             return redirect()->route('receptionist.reservations.index')->with('success', 'Reservasi berhasil dibuat!');
@@ -115,9 +155,8 @@ class ReceptionistController extends Controller
     /**
      * Lihat detail reservasi tertentu.
      */
-    public function show($id)
+    public function show(Reservation $reservation)
     {
-        $reservation = Reservation::with(['user', 'room'])->findOrFail($id);
-        return view('private.receptionist.reservations.show', compact('reservation'));
+        return view('private.receptionist.reservation.detail', compact('reservation'));
     }
 }

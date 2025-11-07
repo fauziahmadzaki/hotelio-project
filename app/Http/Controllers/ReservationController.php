@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Room;
+use App\Models\Income;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,9 +16,10 @@ class ReservationController extends Controller
     
     public function index()
     {
-        $reservations =  Reservation::with(['room'])->latest()->get();
-        return view('private.admin.reservations.index', compact('reservations'));
+        $reservations =  Reservation::where('status', '!=', 'completed')->where('status', '!=', 'cancelled')->with(['room'])->latest()->get();
+        return view('private.admin.reservations\.index', compact('reservations'));
     }
+
 
     public function create(){
         $rooms = Room::where('room_status', 'available')->get();
@@ -56,6 +58,8 @@ class ReservationController extends Controller
                 'check_out_date' => $validated['check_out_date'],
                 'total_guests' => $validated['total_guests'],
                 'total_price' => $totalPrice,
+                'payment_method' => $validated['payment_method'],
+                'notes' => $validated['notes'],
                 'status' => $validated['status'],
             ]);
             
@@ -81,31 +85,41 @@ class ReservationController extends Controller
         return view('private.admin.reservations.edit', compact('reservation', 'rooms'));
     }
 
-    public function update(UpdateReservationRequest $request, Reservation $reservation)
-    {
-    $validated = $request->validated();
-    DB::beginTransaction();
+        public function update(UpdateReservationRequest $request, Reservation $reservation)
+        {
+            $validated = $request->validated();
+            DB::beginTransaction();
 
-    try {
-        $reservation->update($validated);
+            try {
+                $reservation->update($validated);
 
-        if (in_array($validated['status'], ['cancel', 'completed'])) {
-            Room::where('id', $reservation->room_id)->update([
-                'room_status' => 'available'
-            ]);
-        }
+                if (in_array($validated['status'], ['cancel', 'completed'])) {
+                    Room::where('id', $reservation->room_id)->update([
+                        'room_status' => 'available'
+                    ]);
+                }
+                if($validated['status'] == 'completed'){
+                    Income::create([
+                        'amount' => $reservation->total_price,
+                        'payment_method' => $reservation->payment_method,
+                        'type' => 'income',
+                        'date' => now(),
+                        'description' => 'Reservasi '.$reservation->id,
+                        'category' => 'rental',
+                    ]);
+                }
 
-        DB::commit();
-        
-        if(Auth::user()->role == 'receptionist'){
-            return redirect()->route('receptionist.reservations.index')->with('success', 'Reservasi berhasil diperbarui.');
-        }else{
-            return redirect()->route('admin.reservations.index')->with('success', 'Reservasi berhasil diperbarui.');
-        }
-    } catch (\Throwable $th) {
-        DB::rollBack();
-        return back()->with('error', 'Gagal memperbarui reservasi: '.$th->getMessage());
-    }
+                DB::commit();
+                
+                if(Auth::user()->role == 'receptionist'){
+                    return redirect()->route('receptionist.reservations.index')->with('success', 'Reservasi berhasil diperbarui.');
+                }else{
+                    return redirect()->route('admin.reservations.index')->with('success', 'Reservasi berhasil diperbarui.');
+                }
+            } catch (\Throwable $th) {
+                DB::rollBack();
+                return back()->with('error', 'Gagal memperbarui reservasi: '.$th->getMessage());
+            }
     }
 
     /**

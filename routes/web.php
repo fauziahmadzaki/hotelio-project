@@ -6,11 +6,13 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\GuestController;
+use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\ReservationController;
 
 // public 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/room', [HomeController::class, 'rooms'])->name('room');
 Route::get('/room/detail/{id}', [RoomController::class, 'showRoomDetail'])->name('room.detail');
 
 Route::controller(AuthController::class)->group(function () {
@@ -22,6 +24,8 @@ Route::controller(AuthController::class)->group(function () {
     });
 
     Route::middleware('auth')->group(function () {
+        Route::get('/reset-password', 'showResetPassword')->name('reset-password');
+        Route::post('/reset-password', 'resetPassword');
         Route::post('/logout', 'logout')->name('logout');
     });
 });
@@ -32,11 +36,14 @@ Route::middleware(['auth', 'role:user,admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-
+        
         Route::controller(AdminController::class)->group(function () {
             Route::get('/', 'index')->name('dashboard');
             Route::get('/users', 'users')->name('users');
             Route::patch('/users/{user}/update-role', 'updateUserRole')->name('users.updateRole');
+            route::get('/reservations/completed', 'showCompletedReservations')->name('reservations.completed');
+            route::get('/reservations/cancelled', 'showCancelledReservations')->name('reservations.cancelled');
+            Route::get('/reservations/detail/{reservation}', 'detail')->name('reservations.detail');
         });
 
         Route::controller(RoomController::class)
@@ -57,6 +64,7 @@ Route::middleware(['auth', 'role:user,admin'])
             ->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::get('/create', 'create')->name('create');
+
                 Route::post('/store', 'store')->name('store');
                 Route::get('/{reservation}', 'show')->name('show');
                 Route::put('/{reservation}', 'update')->name('update');
@@ -74,7 +82,19 @@ Route::middleware(['auth', 'role:user,admin'])
                Route::put('/{facility}', 'update')->name('update');
                Route::delete('/{facility}', 'destroy')->name('destroy');
             });
+
+        Route::controller(IncomeController::class)
+                ->prefix('incomes')
+                ->name('incomes.')
+                ->group(function () {
+                    Route::get('/', 'index')->name('index');
+                    Route::get('/create', 'create')->name('create');
+                    Route::post('/store', 'store')->name('store');
+                    Route::get('/edit/{income}', 'edit')->name('edit');
+                    Route::put('/update/{income}', 'update')->name('update');
+                    Route::delete('/destroy/{income}', 'destroy')->name('destroy');
     });
+});
 
 Route::middleware(['auth', 'role:receptionist,admin'])
     ->prefix('receptionist')
@@ -82,11 +102,16 @@ Route::middleware(['auth', 'role:receptionist,admin'])
     ->group(function () {
         Route::controller(\App\Http\Controllers\ReceptionistController::class)->group(function () {
             Route::get('/', 'index')->name('dashboard');
-            Route::get('/reservations', 'listReservations')->name('reservations.index');
-            Route::get('/reservations',  'reservations')->name('reservations.index');
+            Route::get('/reservations', 'showActiveReservations')->name('reservations.index');
+            Route::get('/reservation/completed', 'showCompletedReservations')->name('reservations.completed');
+// Reservasi dibatalkan
+            Route::get('/reservation/cancelled', 'showCancelledReservations')->name('reservations.cancelled');
+            // Route::get('/reservations', 'listReservations')->name('reservations.index');
+            // Route::get('/reservations',  'reservations')->name('reservations.index');
             Route::patch('/reservations/{id}',  'updateReservationStatus')->name('reservations.update');
             Route::get('/reservations/create', 'create')->name('reservations.create');
             Route::post('/reservations', 'storeReservation')->name('reservations.store');
+            Route::get('/reservations/detail/{reservation}', 'show')->name('reservations.show');
             
         });
             

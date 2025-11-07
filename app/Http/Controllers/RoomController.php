@@ -12,11 +12,46 @@ use Illuminate\Support\Facades\Storage;
 
 class RoomController extends Controller
 {
-    public function index(){
-        $rooms = Room::paginate(5);
-        return view('private.admin.room.index', [
-            'rooms' => $rooms]);
+   public function index(Request $request)
+{
+    $query = Room::query()->with('facilities');
+
+    // Filter berdasarkan status
+    if ($request->filled('status')) {
+        $query->where('room_status', $request->status);
     }
+
+    // Filter berdasarkan fasilitas
+    if ($request->filled('facility')) {
+        $query->whereHas('facilities', function ($q) use ($request) {
+            $q->where('facilities.id', $request->facility);
+        });
+    }
+
+    // Filter berdasarkan rentang harga
+    if ($request->filled('min_price')) {
+        $query->where('room_price', '>=', $request->min_price);
+    }
+
+    if ($request->filled('max_price')) {
+        $query->where('room_price', '<=', $request->max_price);
+    }
+
+    // Filter berdasarkan kapasitas
+    if ($request->filled('capacity')) {
+        $query->where('room_capacity', '>=', $request->capacity);
+    }
+
+    // Ambil hasil dengan pagination
+    $rooms = $query->paginate(5)->appends($request->query());
+
+    return view('private.admin.room.index', [
+        'rooms' => $rooms,
+        'facilities' => Facility::all(),
+        'filters' => $request->only(['status', 'facility', 'min_price', 'max_price', 'capacity']),
+    ]);
+}
+
 
     public function create(){
 

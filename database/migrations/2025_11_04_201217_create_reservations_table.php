@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('room_id')->constrained('rooms')->onDelete('cascade');
             $table->string('person_name');
             $table->string('person_phone_number');
+            $table->longText('notes')->nullable();
             $table->date('check_in_date');
             $table->date('check_out_date');
             $table->date('confirmation_date')->nullable();
@@ -24,7 +25,8 @@ return new class extends Migration
             $table->integer('total_guests')->default(1);
             $table->decimal('total_price', 10, 2)->nullable();
             $table->integer('number_of_nights')->nullable();
-            $table->enum('status', ['pending', 'confirmed', 'cancelled', 'checked_in', 'completed'])->default('pending');
+            $table->enum('payment_method', ['cash', 'transfer', 'card'])->default('cash');
+            $table->enum('status', ['pending', 'cancelled', 'checked_in', 'completed'])->default('pending');
             $table->timestamps();
         });
     }

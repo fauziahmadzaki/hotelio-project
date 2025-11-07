@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Room;
 use App\Models\User;
+use App\Models\Income;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,8 +21,7 @@ class AdminController extends Controller
         $totalReservations = Reservation::count();
 
        
-       $totalRevenue = Reservation::whereIn('status', ['confirmed', 'checkin', 'completed'])
-    ->sum('total_price');
+       $totalRevenue = Income::where('type', 'income')->sum('amount');
 
         $statusCounts = Reservation::select('status', DB::raw('COUNT(*) as count'))
             ->groupBy('status')
@@ -59,15 +59,21 @@ class AdminController extends Controller
     }
 
 
-    public function reservations()
+    public function showActiveReservations()
     {
-        $reservations = Reservation::with(['user:id,name,email', 'room:id,room_name'])
-            ->latest()
-            ->paginate(10);
-
+        $reservations =  Reservation::where('status', '!=', 'completed')->where('status', '!=', 'cancelled')->with(['room'])->latest()->get();
         return view('private.admin.reservations.index', compact('reservations'));
     }
 
+    public function showCompletedReservations(){
+        $reservations =  Reservation::where('status', 'completed')->with(['room'])->latest()->get();
+        return view('private.admin.reservations.completed', compact('reservations'));
+    }
+
+    public function showCancelledReservations(){
+        $reservations =  Reservation::where('status', 'cancelled')->with(['room'])->latest()->get();
+        return view('private.admin.reservations.cancelled', compact('reservations'));
+    }
 
 
     public function users(Request $request)
@@ -96,6 +102,10 @@ class AdminController extends Controller
         $user->update(['role' => $validated['role']]);
 
         return redirect()->route('admin.users')->with('success', "Role {$user->name} berhasil diubah!");
+    }
+
+    public function detail(Reservation $reservation){
+        return view('private.admin.reservations.detail', compact('reservation'));
     }
 
     public function destroy(User $user)

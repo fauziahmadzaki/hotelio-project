@@ -30,8 +30,6 @@ $user = auth()->user();
         </div>
 
         {{-- Step progress --}}
-
-
         {{-- Form pemesanan --}}
         <form action="{{ route('guest.reservations.store1') }}" method="POST" class="space-y-4">
             @csrf
@@ -42,6 +40,9 @@ $user = auth()->user();
             <x-input-group id="person_phone_number" name="person_phone_number" label="Nomor Handphone" type="text"
                 placeholder="0858xxxxxxx" value="{{ old('person_phone_number', $user->profile->phone_number) }}"
                 error="{{ $errors->first('person_phone_number') }}" />
+            <x-input-group id="notes" name="notes" label="Catatan Tambahan (opsional)" type="textarea"
+                placeholder="Catatan tambahan" value="{{ old('notes', $user->profile->phone_number) }}"
+                error="{{ $errors->first('notes') }}" />
 
             <div class="flex flex-col sm:flex-row gap-4 w-full">
                 <x-input-group id="check_in_date" name="check_in_date" label="Tanggal Check-in" type="date"

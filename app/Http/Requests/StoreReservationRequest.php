@@ -26,6 +26,10 @@ class StoreReservationRequest extends FormRequest
         'user_id' => 'nullable|exists:users,id',
         'room_id' => 'required|exists:rooms,id',
 
+        'notes' => 'nullable|max:500',
+
+        'payment_method' => 'required|in:cash,transfer,card',
+
         'person_name' => 'required|string|max:255',
         'person_phone_number' => 'required|string|max:20',
 

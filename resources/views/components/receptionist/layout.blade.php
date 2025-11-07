@@ -1,17 +1,15 @@
 <x-layout>
-    <x-slot:title>{{ $title ?? 'Dashboard' }}</x-slot:title>
+    <x-slot:title>{{ $title ?? "Dashboard" }}</x-slot:title>
 
-    {{-- ======== NAVBAR ======== --}}
+    {{-- 🔹 Navbar --}}
     <nav
         class="fixed top-0 left-0 w-full bg-white border-b border-gray-200 shadow-sm z-40 flex justify-between items-center px-5 py-3">
         {{-- Brand --}}
-        <h1 class="font-bold text-violet-600 text-lg">
-            Hotelio {{ auth()->user()->role === 'admin' ? 'Admin' : 'Receptionist' }}
-        </h1>
+        <h1 class="font-bold text-violet-600 text-lg">Hotelio Receptionist</h1>
 
-        {{-- Right Side --}}
+        {{-- Bagian kanan --}}
         <div class="flex items-center gap-4">
-            {{-- Profile Dropdown --}}
+            {{-- Profil --}}
             <div class="relative" x-data="{ open: false }">
                 <button @click="open = !open" class="flex items-center gap-2 focus:outline-none">
                     <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=7c3aed&color=fff"
@@ -23,11 +21,11 @@
                     </svg>
                 </button>
 
-                {{-- Dropdown Menu --}}
+                {{-- Dropdown --}}
                 <div x-show="open" @click.away="open = false"
                     class="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-md py-2 z-50">
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profil Saya</a>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Pengaturan</a>
+                    {{-- <a href="{{ route('receptionist.profile.show') }}"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profil Saya</a> --}}
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
@@ -36,7 +34,7 @@
                 </div>
             </div>
 
-            {{-- Mobile Toggle --}}
+            {{-- Tombol toggle sidebar (mobile) --}}
             <button id="menu-toggle" class="lg:hidden p-2 rounded-md hover:bg-gray-100">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
@@ -46,70 +44,127 @@
         </div>
     </nav>
 
-    {{-- ======== SIDEBAR ======== --}}
+    {{-- 🔹 Sidebar --}}
     <aside id="sidebar"
-        class="fixed top-[56px] left-0 z-30 bg-white w-64 h-[calc(100vh-56px)] py-5 border-r border-gray-200 shadow-sm flex flex-col justify-between transform -translate-x-full lg:translate-x-0 transition-transform duration-200">
-        <div>
-            <h1 class="text-lg text-center font-semibold">
-                <span class="text-violet-500">
-                    {{ auth()->user()->role === 'admin' ? 'Admin' : 'Receptionist' }}
-                </span> Dashboard
-            </h1>
+        class="fixed top-[56px] left-0 z-30 bg-white w-64 h-[calc(100vh-56px)] border-r border-gray-200 shadow-sm flex flex-col justify-between transform -translate-x-full lg:translate-x-0 transition-transform duration-200">
 
-            <ul class="w-full flex flex-col items-center mt-10 gap-5">
-                {{-- Dashboard --}}
-                <x-admin.navlink :active="request()->routeIs(auth()->user()->role.'.dashboard')">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="lucide lucide-layout-dashboard">
-                        <rect width="7" height="9" x="3" y="3" rx="1" />
-                        <rect width="7" height="5" x="14" y="3" rx="1" />
-                        <rect width="7" height="9" x="14" y="12" rx="1" />
-                        <rect width="7" height="5" x="3" y="16" rx="1" />
-                    </svg>
-                    <a href="{{ route(auth()->user()->role.'.dashboard') }}">Dashboard</a>
-                </x-admin.navlink>
+        <div class="flex flex-col justify-between h-full border-e border-gray-100 bg-white">
+            <div class="px-4 py-6">
+                <ul class="mt-6 space-y-1">
+                    {{-- Dashboard --}}
+                    <li>
+                        <x-admin.navlink href="{{ route('receptionist.dashboard') }}"
+                            :active="request()->routeIs('receptionist.dashboard')">
+                            Dashboard
+                        </x-admin.navlink>
+                    </li>
 
-                {{-- Kamar (Admin only) --}}
-                @if (auth()->user()->role === 'admin')
-                <x-admin.navlink :active="request()->is('admin/room*')">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="lucide lucide-bed-single">
-                        <path d="M3 20v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8" />
-                        <path d="M5 10V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4" />
-                        <path d="M3 18h18" />
-                    </svg>
-                    <a href="{{ route('admin.rooms.index') }}">Kamar</a>
-                </x-admin.navlink>
-                @endif
+                    {{-- Reservasi --}}
+                    <li>
+                        <details class="group [&_summary::-webkit-details-marker]:hidden">
+                            <summary
+                                class="flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700">
+                                <span class="text-sm font-medium"> Reservasi </span>
+                                <span class="shrink-0 transition duration-300 group-open:-rotate-180">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </span>
+                            </summary>
 
-                {{-- Reservasi (Both Roles) --}}
-                <x-admin.navlink :active="request()->is(auth()->user()->role.'/reservation*')">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="lucide lucide-concierge-bell">
-                        <path d="M3 20a1 1 0 0 1-1-1v-1a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1Z" />
-                        <path d="M20 16a8 8 0 1 0-16 0" />
-                        <path d="M12 4v4" />
-                        <path d="M10 4h4" />
-                    </svg>
-                    <a href="{{ route(auth()->user()->role.'.reservations.index') }}">Reservasi</a>
-                </x-admin.navlink>
-            </ul>
-        </div>
+                            <ul class="mt-2 space-y-1 px-4">
+                                {{-- Reservasi Aktif --}}
+                                <li>
+                                    <a href="{{ route('receptionist.reservations.index') }}"
+                                        class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
+                                        Reservasi Aktif
+                                    </a>
+                                </li>
 
-        <div class="p-5 text-center text-xs text-gray-400 border-t border-gray-100">
-            &copy; {{ date('Y') }} <span class="text-violet-500 font-semibold">Hotelio</span>
+                                {{-- Reservasi Selesai --}}
+                                <li>
+                                    <a href="{{ route('receptionist.reservations.completed') }}"
+                                        class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
+                                        Reservasi Selesai
+                                    </a>
+                                </li>
+
+                                {{-- Reservasi Dibatalkan --}}
+                                <li>
+                                    <a href="{{ route('receptionist.reservations.cancelled') }}"
+                                        class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
+                                        Reservasi Dibatalkan
+                                    </a>
+                                </li>
+                            </ul>
+                        </details>
+                    </li>
+                    <li>
+                        <details class="group [&amp;_summary::-webkit-details-marker]:hidden">
+                            <summary
+                                class="flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700">
+                                <span class="text-sm font-medium"> Akun </span>
+
+                                <span class="shrink-0 transition duration-300 group-open:-rotate-180">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </span>
+                            </summary>
+
+                            <ul class="mt-2 space-y-1 px-4">
+                                <li>
+                                    <a href="{{ route('reset-password') }}"
+                                        class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
+                                        Reset Password
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit"
+                                            class="w-full rounded-lg px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 text-left">
+                                            Logout
+                                        </button>
+                                    </form>
+                                </li>
+
+                            </ul>
+                        </details>
+                    </li>
+
+                    {{-- Pengaturan (dropdown) --}}
+
+                </ul>
+            </div>
+
+            {{-- Footer Sidebar --}}
+            <div class="border-t border-gray-100 p-4">
+                <div class="flex items-center gap-3">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=7c3aed&color=fff"
+                        alt="User avatar" class="size-9 rounded-full object-cover">
+                    <div>
+                        <p class="text-sm font-medium text-gray-700">{{ Auth::user()->name }}</p>
+                        <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </aside>
 
-    {{-- ======== MAIN CONTENT ======== --}}
-    <main class="lg:ml-64 mt-[56px] p-10 bg-gray-50 min-h-screen transition-all duration-200 space-y-5">
+    {{-- 🔹 Main Content --}}
+    <main class="lg:ml-64 mt-[56px] p-8 bg-gray-50 min-h-screen transition-all duration-200 space-y-5">
         {{ $slot ?? '' }}
     </main>
 
-    {{-- Alpine.js --}}
+    {{-- Alpine.js & Sidebar Toggle --}}
     <script src="//unpkg.com/alpinejs" defer></script>
     <script>
         document.getElementById('menu-toggle').addEventListener('click', () => {

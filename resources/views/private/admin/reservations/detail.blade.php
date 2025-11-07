@@ -9,8 +9,14 @@ $days = max(1, $checkOut->diffInDays($checkIn));
 $status = strtolower($reservation->status);
 @endphp
 
-<x-guest.layout>
+<x-admin.layout>
     <x-card.index class="max-w-2xl mx-auto p-6 sm:p-8 space-y-6">
+        {{-- Judul Halaman --}}
+        <div class="text-center mb-4">
+            <h1 class="text-2xl font-bold text-violet-600">Detail Reservasi</h1>
+            <p class="text-gray-500 text-sm">Informasi lengkap reservasi Anda</p>
+        </div>
+
         {{-- Gambar kamar --}}
         <div class="flex flex-col items-center space-y-3">
             <img src="{{ asset('storage/' . $room->image) }}" alt="Foto kamar {{ $room->room_name }}"
@@ -23,8 +29,7 @@ $status = strtolower($reservation->status);
                 @elseif ($status === 'cancelled') bg-red-100 text-red-700
                 @elseif ($status === 'checkin') bg-blue-100 text-blue-700
                 @elseif ($status === 'completed') bg-violet-100 text-violet-700
-                @else bg-gray-100 text-gray-700 @endif
-            ">
+                @else bg-gray-100 text-gray-700 @endif">
                 {{ ucfirst($status) }}
             </span>
         </div>
@@ -58,7 +63,6 @@ $status = strtolower($reservation->status);
                 <p><span class="font-medium">Durasi:</span> {{ $days }} malam</p>
                 <p><span class="font-medium">Jumlah Tamu:</span> {{ $reservation->total_guests }} orang</p>
 
-                {{-- Catatan tambahan --}}
                 @if (!empty($reservation->notes))
                 <p class="sm:col-span-2">
                     <span class="font-medium">Catatan Tambahan:</span> {{ $reservation->notes }}
@@ -92,7 +96,6 @@ $status = strtolower($reservation->status);
                     Rp {{ number_format($grandTotal, 0, ',', '.') }}
                 </p>
 
-                {{-- Metode pembayaran --}}
                 <p class="font-medium border-t border-gray-200 pt-2">Metode Pembayaran</p>
                 <p class="text-right border-t border-gray-200 pt-2 capitalize">
                     {{ $reservation->payment_method ?? '-' }}
@@ -100,40 +103,12 @@ $status = strtolower($reservation->status);
             </div>
         </div>
 
-        {{-- Progres langkah --}}
-        <div class="mt-6">
-            <div
-                class="relative after:absolute after:inset-x-0 after:top-1/2 after:h-0.5 after:bg-gray-200 after:-translate-y-1/2">
-                <ol class="relative z-10 flex justify-between text-sm font-medium text-gray-600">
-                    <li class="flex items-center gap-2 bg-white p-2">
-                        <span class="size-6 rounded-full bg-gray-100 text-center text-[10px]/6 font-bold">1</span>
-                        <span class="hidden sm:block">Detail Pemesanan</span>
-                    </li>
-                    <li class="flex items-center gap-2 bg-white p-2">
-                        <span class="size-6 rounded-full bg-gray-100 text-center text-[10px]/6 font-bold">2</span>
-                        <span class="hidden sm:block">Konfirmasi Pembayaran</span>
-                    </li>
-                    <li class="flex items-center gap-2 bg-white p-2">
-                        <span
-                            class="size-6 rounded-full bg-violet-500 text-center text-[10px]/6 font-bold text-white">3</span>
-                        <span class="hidden sm:block">Bukti Pembayaran</span>
-                    </li>
-                </ol>
-            </div>
-        </div>
-
-        {{-- Tombol aksi --}}
+        {{-- Tombol Kembali --}}
         <div class="pt-4">
-            <a href="{{ route('guest.dashboard') }}"
+            <a href="{{ route('admin.reservations.index') }}"
                 class="block text-center font-semibold w-full bg-violet-600 hover:bg-violet-700 text-white py-2 rounded-lg transition-all duration-200">
-                Kembali ke Dashboard
+                Kembali ke Daftar Reservasi
             </a>
         </div>
     </x-card.index>
-</x-guest.layout>
-
-{{-- Disable back navigation --}}
-<script>
-    window.history.replaceState(null, "", location.href);
-    window.onpopstate = () => window.history.pushState(null, "", window.location.href);
-</script>
+    </x-recept.layout>

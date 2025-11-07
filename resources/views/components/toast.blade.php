@@ -1,6 +1,6 @@
 @if (session('success') || session('error'))
 <div role="alert" id="alert"
-    class="fixed top-5 right-5 z-99 rounded-md border {{ session('success')? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50' }} p-4 shadow-sm">
+    class="fixed top-20 right-5 z-99 rounded-md border {{ session('success')? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50' }} p-4 shadow-sm">
     <div class="flex items-start gap-4"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
             stroke-width="1.5" stroke="currentColor" class="-mt-0.5 size-6 text-green-700">
             <path stroke-linecap="round" stroke-linejoin="round"
