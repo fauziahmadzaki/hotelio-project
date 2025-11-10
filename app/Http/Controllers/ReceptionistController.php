@@ -61,23 +61,20 @@ class ReceptionistController extends Controller
     public function showActiveReservations()
     {
         $reservations =  Reservation::where('status', '!=', 'completed')->where('status', '!=', 'cancelled')->with(['room'])->latest()->get();
-        return view('private.receptionist.reservation.index', compact('reservations'));
+        return view('private.receptionist.reservations.index', compact('reservations'));
     }
 
     public function showCompletedReservations(){
         $reservations =  Reservation::where('status', 'completed')->with(['room'])->latest()->get();
-        return view('private.receptionist.reservation.completed', compact('reservations'));
+        return view('private.receptionist.reservations.completed', compact('reservations'));
     }
 
     public function showCancelledReservations(){
         $reservations =  Reservation::where('status', 'cancelled')->with(['room'])->latest()->get();
-        return view('private.receptionist.reservation.cancelled', compact('reservations'));
+        return view('private.receptionist.reservations.cancelled', compact('reservations'));
     }
 
 
-    /**
-     * Update status reservasi (confirm, checkin, complete, cancel)
-     */
     public function updateReservationStatus(Request $request, $id)
 {
     $request->validate([
@@ -95,7 +92,6 @@ class ReceptionistController extends Controller
        if (in_array($request->status, ['completed', 'cancelled'])) {
             $reservation->room->update(['room_status' => 'available']);
         }
-
         // 🔹 Jika status menjadi completed, buat record Income
         if ($request->status === 'completed') {
             \App\Models\Income::create([
@@ -119,7 +115,7 @@ class ReceptionistController extends Controller
 
     public function create(){
         $rooms = Room::where('room_status', 'available')->get();
-        return view('private.receptionist.reservation.create', compact('rooms'));
+        return view('private.receptionist.reservations.create', compact('rooms'));
     }
 
     public function storeReservation(StoreReservationRequest $request){
@@ -142,6 +138,10 @@ class ReceptionistController extends Controller
                 'status' => $validated['status'],
                 'payment_method' => $validated['payment_method'],
                 'notes' => $validated['notes'],
+            ]);
+
+            $room->update([
+                'room_status' => 'booked'
             ]);
             DB::commit();
             return redirect()->route('receptionist.reservations.index')->with('success', 'Reservasi berhasil dibuat!');

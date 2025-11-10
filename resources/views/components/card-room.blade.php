@@ -36,17 +36,6 @@
                 Lihat Detail
             </a>
 
-            @if ($status == 'available')
-            <a href="{{ route('guest.reservations.create1', $id) }}"
-                class="w-full text-center rounded-md bg-violet-600 text-white font-semibold py-2 hover:bg-violet-700 transition">
-                Booking
-            </a>
-            @else
-            <button disabled
-                class="w-full text-center rounded-md bg-gray-300 text-white font-semibold py-2 cursor-not-allowed">
-                Tidak Tersedia
-            </button>
-            @endif
         </div>
     </div>
 </div>

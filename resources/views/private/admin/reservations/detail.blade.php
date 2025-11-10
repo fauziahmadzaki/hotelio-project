@@ -43,7 +43,7 @@ $status = strtolower($reservation->status);
             <div>
                 <p class="font-medium mb-1">Fasilitas:</p>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 text-sm font-medium">
-                    @forelse ($room->facilities as $facility)
+                    @forelse ($room->roomType->facilities as $facility)
                     <p>• {{ $facility->facility_name }}</p>
                     @empty
                     <p class="text-gray-500 italic">Tidak ada fasilitas terdaftar</p>

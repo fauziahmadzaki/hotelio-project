@@ -3,80 +3,112 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Room;
+use Illuminate\Validation\Validator;
 
 class StoreReservationRequest extends FormRequest
 {
-    /**
-     * Tentukan apakah user boleh mengirim request ini.
-     */
+
     public function authorize(): bool
     {
-        // true = semua user yang login boleh buat reservasi
         return true;
     }
 
-    /**
-     * Rules validasi untuk form reservasi.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
-{
-    return [
-        'user_id' => 'nullable|exists:users,id',
-        'room_id' => 'required|exists:rooms,id',
+    {
+        return [
+            'room_id' => 'required|exists:rooms,id',
+            'person_name' => 'required|string|max:255',
+            
+            'person_phone_number' => [
+                'required',
+                'string',
+                'max:12',
+                'regex:/^(08|\+628)\d{8,12}$/' 
+            ],
 
-        'notes' => 'nullable|max:500',
+            'notes' => 'nullable|string|max:500',
+            'check_in_date' => 'required|date|after_or_equal:today',
+            'check_out_date' => 'required|date|after:check_in_date',
+            'total_guests' => 'required|integer|min:1', 
+            'payment_method' => 'required|in:cash,transfer,card',
+            'status' => 'nullable|in:pending,confirmed,checked_in,completed,cancelled',
+            'total_price' => 'nullable|numeric|min:0',
+        ];
+    }
 
-        'payment_method' => 'required|in:cash,transfer,card',
+    public function messages(): array
+    {
+        return [
+            'room_id.required' => 'Kamar wajib dipilih.',
+            'room_id.exists' => 'Kamar yang dipilih tidak valid.',
 
-        'person_name' => 'required|string|max:255',
-        'person_phone_number' => 'required|string|max:20',
+            'person_name.required' => 'Nama pemesan wajib diisi.',
+            'person_name.string' => 'Nama pemesan harus berupa teks.',
+            'person_name.max' => 'Nama pemesan maksimal 255 karakter.',
 
-        'check_in_date' => 'required|date|after_or_equal:today',
-        'check_out_date' => 'required|date|after:check_in_date',
+            'person_phone_number.required' => 'Nomor telepon wajib diisi.',
+            'person_phone_number.string' => 'Nomor telepon harus berupa teks.',
+            'person_phone_number.max' => 'Nomor telepon maksimal 12 karakter.',
+            'person_phone_number.regex' => 'Format nomor telepon tidak valid. Gunakan 08... atau +628...',
 
-        'total_guests' => 'required|integer|min:1',
+            'notes.max' => 'Catatan maksimal 500 karakter.',
 
-        'total_price' => 'nullable|numeric|min:0',
+            'check_in_date.required' => 'Tanggal check-in wajib diisi.',
+            'check_in_date.date' => 'Tanggal check-in tidak valid.',
+            'check_in_date.after_or_equal' => 'Tanggal check-in minimal hari ini.',
 
-        'status' => 'nullable|in:pending,confirmed,cancelled,checked_in,completed',
-    ];
-}
+            'check_out_date.required' => 'Tanggal check-out wajib diisi.',
+            'check_out_date.date' => 'Tanggal check-out tidak valid.',
+            'check_out_date.after' => 'Tanggal check-out harus setelah tanggal check-in.',
 
-/**
- * Pesan error kustom.
- */
-public function messages(): array
-{
-    return [
-        'room_id.required' => 'Kamar wajib dipilih.',
-        'room_id.exists' => 'Kamar yang dipilih tidak valid.',
+            'total_guests.required' => 'Jumlah tamu wajib diisi.',
+            'total_guests.integer' => 'Jumlah tamu harus berupa angka.',
+            'total_guests.min' => 'Minimal 1 tamu.',
 
-        'person_name.required' => 'Nama pemesan wajib diisi.',
-        'person_name.string' => 'Nama pemesan harus berupa teks.',
-        'person_name.max' => 'Nama pemesan maksimal 255 karakter.',
+            'payment_method.required' => 'Metode pembayaran wajib dipilih.',
+            'payment_method.in' => 'Metode pembayaran tidak valid.',
 
-        'person_phone_number.required' => 'Nomor telepon wajib diisi.',
-        'person_phone_number.string' => 'Nomor telepon harus berupa teks.',
-        'person_phone_number.max' => 'Nomor telepon maksimal 20 karakter.',
+            'status.in' => 'Status reservasi tidak valid.',
 
-        'check_in_date.required' => 'Tanggal check-in wajib diisi.',
-        'check_in_date.date' => 'Tanggal check-in harus berupa format tanggal yang valid.',
-        'check_in_date.after_or_equal' => 'Tanggal check-in minimal hari ini.',
+            'total_price.numeric' => 'Total harga harus berupa angka.',
+            'total_price.min' => 'Total harga tidak boleh negatif.',
+        ];
+    }
 
-        'check_out_date.required' => 'Tanggal check-out wajib diisi.',
-        'check_out_date.date' => 'Tanggal check-out harus berupa format tanggal yang valid.',
-        'check_out_date.after' => 'Tanggal check-out harus setelah tanggal check-in.',
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'status' => $this->status ?? 'pending',
+        ]);
+    }
 
-        'total_guests.required' => 'Jumlah tamu wajib diisi.',
-        'total_guests.integer' => 'Jumlah tamu harus berupa angka.',
-        'total_guests.min' => 'Minimal 1 tamu.',
+    /**
+     * 
+     *
+     * @param \Illuminate\Validation\Validator $validator
+     * @return void
+     */
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function ($validator) {
+            $data = $validator->getData();
 
-        'total_price.numeric' => 'Total harga harus berupa angka.',
-        'total_price.min' => 'Total harga tidak boleh negatif.',
+            $roomId = $data['room_id'] ?? null;
+            $totalGuests = $data['total_guests'] ?? null;
 
-        'status.in' => 'Status tidak valid. Pilihan: pending, confirmed, cancelled, atau completed.',
-    ];
-}
+            if ($roomId && $totalGuests) {
+                $room = Room::find($roomId);
+
+                if ($room) {
+                    if ($totalGuests > $room->room_capacity) {
+                        $validator->errors()->add(
+                            'total_guests',
+                            "Jumlah tamu ({$totalGuests}) melebihi kapasitas kamar ({$room->room_capacity})."
+                        );
+                    }
+                }
+            }
+        });
+    }
 }

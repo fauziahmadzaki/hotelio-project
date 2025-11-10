@@ -23,6 +23,7 @@ class RoomFactory extends Factory
             'room_capacity' => $this->faker->numberBetween(1, 6),
             'room_price' => $this->faker->numberBetween(150000, 2000000),
             'image' => 'images/room.jpg',
+            'room_type_id' => $this->faker->numberBetween(1, 2),
             'room_status' => $this->faker->randomElement(['available', 'booked', 'maintenance']),
         ];
     }

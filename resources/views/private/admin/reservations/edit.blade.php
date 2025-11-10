@@ -1,8 +1,18 @@
 <x-admin.layout>
-    <x-card class="max-w-xl">
+    <x-card class="max-w-xl mx-auto">
         <h1 class="text-lg font-bold mb-3">Edit Reservasi</h1>
 
-        <form action="{{ route('admin.reservations.update', $reservation->id) }}" method="POST" class="space-y-3">
+        {{-- PERBAIKAN: Tentukan route secara dinamis --}}
+        @php
+        $updateRoute = Auth::user()->role === 'receptionist'
+        ? 'receptionist.reservations.update'
+        : 'admin.reservations.update';
+        $indexRoute = Auth::user()->role === 'receptionist'
+        ? 'receptionist.reservations.index'
+        : 'admin.reservations.index';
+        @endphp
+
+        <form action="{{ route($updateRoute, $reservation->id) }}" method="POST" class="space-y-3">
             @csrf
             @method('PUT')
 
@@ -21,7 +31,7 @@
                 value="{{ old('notes', $reservation->notes) }}" error="{{ $errors->first('notes') }}"></x-input-group>
 
             {{-- Tanggal Check-in & Check-out --}}
-            <div class="flex gap-4 w-full items-end">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <x-input-group id="check_in_date" label="Tanggal Check-in" type="date"
                     value="{{ old('check_in_date', $reservation->check_in_date->format('Y-m-d')) }}"
                     error="{{ $errors->first('check_in_date') }}"></x-input-group>
@@ -36,29 +46,15 @@
                 value="{{ old('total_guests', $reservation->total_guests) }}"
                 error="{{ $errors->first('total_guests') }}"></x-input-group>
 
-            {{-- Pilih Kamar --}}
-            <div>
-                <x-label>Kamar</x-label>
-                @error('room_id')
-                <x-error>{{ $message }}</x-error>
-                @enderror
-                <select name="room_id" class="w-fit border border-gray-200 rounded-lg p-2">
-                    @foreach ($rooms as $room)
-                    <option value="{{ $room->id }}" {{ old('room_id', $reservation->room_id) == $room->id ? 'selected' :
-                        '' }}>
-                        {{ $room->room_code }}
-                    </option>
-                    @endforeach
-                </select>
-            </div>
-
             {{-- Status --}}
             <div>
-                <x-label>Status</x-label>
+                <x-label for="status">Status Reservasi</x-label>
                 @error('status')
                 <x-error>{{ $message }}</x-error>
                 @enderror
-                <select name="status" class="w-fit border border-gray-200 rounded-lg p-2">
+                {{-- PERBAIKAN: Style select agar konsisten --}}
+                <select name="status" id="status"
+                    class="w-full border border-gray-300 rounded-md p-2 mt-1 focus:ring-2 focus:ring-violet-500 focus:outline-none">
                     <option value="pending" {{ old('status', $reservation->status) == 'pending' ? 'selected' : ''
                         }}>Pending</option>
                     <option value="checked_in" {{ old('status', $reservation->status) == 'checked_in' ? 'selected' : ''
@@ -72,11 +68,13 @@
 
             {{-- Metode Pembayaran --}}
             <div>
-                <x-label>Metode Pembayaran</x-label>
+                <x-label for="payment_method">Metode Pembayaran</x-label>
                 @error('payment_method')
                 <x-error>{{ $message }}</x-error>
                 @enderror
-                <select name="payment_method" class="w-fit border border-gray-200 rounded-lg p-2">
+                {{-- PERBAIKAN: Style select agar konsisten --}}
+                <select name="payment_method" id="payment_method"
+                    class="w-full border border-gray-300 rounded-md p-2 mt-1 focus:ring-2 focus:ring-violet-500 focus:outline-none">
                     <option value="cash" {{ old('payment_method', $reservation->payment_method) == 'cash' ? 'selected' :
                         '' }}>Tunai</option>
                     <option value="transfer" {{ old('payment_method', $reservation->payment_method) == 'transfer' ?
@@ -86,8 +84,18 @@
                 </select>
             </div>
 
-            {{-- Tombol Submit --}}
-            <x-button type="submit" class="w-full bg-violet-500 text-white">Simpan Perubahan</x-button>
+            {{-- Tombol Aksi --}}
+            <div class="flex items-center justify-end gap-3 pt-3">
+                {{-- PERBAIKAN: Tombol kembali --}}
+                <a href="{{ route($indexRoute) }}"
+                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-medium text-gray-700">
+                    Batal
+                </a>
+                <x-button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white">
+                    Simpan Perubahan
+                </x-button>
+            </div>
+
         </form>
     </x-card>
 </x-admin.layout>

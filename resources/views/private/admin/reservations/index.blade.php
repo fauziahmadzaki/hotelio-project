@@ -55,7 +55,7 @@
 
                     <td class="px-4 py-2 whitespace-nowrap flex items-center justify-center gap-2">
                         {{-- Edit Button --}}
-                        <a href="{{ route('admin.reservations.show', $item) }}"
+                        <a href="{{ route('admin.reservations.edit', $item) }}"
                             class="inline-block rounded-md border border-indigo-600 bg-indigo-600 px-3 py-1 text-white text-xs font-medium hover:bg-transparent hover:text-indigo-600 transition">
                             Edit
                         </a>

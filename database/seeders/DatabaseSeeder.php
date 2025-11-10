@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
         User::factory(20)->create();
 
         $this->call([
+            RoomTypeSeeder::class,
             FacilitySeeder::class,
             RoomSeeder::class
         ]);

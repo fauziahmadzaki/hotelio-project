@@ -66,12 +66,7 @@
 
         {{-- Tombol Aksi --}}
         <div class="flex justify-end gap-2 mt-6">
-            <a href="{{ route('admin.rooms.edit', $room->id) }}"
-                class="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700">
-                Edit
-            </a>
-            <a href="{{ route('admin.rooms.index') }}"
-                class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
+            <a href="{{ route('home') }}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
                 Kembali
             </a>
         </div>

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Room;
+use App\Models\RoomType;
 use Illuminate\Database\Eloquent\Model;
 
 class Facility extends Model
@@ -12,6 +12,6 @@ class Facility extends Model
     ];
 
     public function rooms()   {
-        return $this->belongsToMany(Room::class, 'facility_room');
+        return $this->belongsToMany(RoomType::class, 'facility_room');
     }
 }

@@ -46,7 +46,7 @@
                     </td>
                     {{-- Kolom Aksi --}}
                     <td class="px-4 py-2 text-center">
-                        <a href="{{ route('receptionist.reservations.show', $item ?? 0) }}" class="inline-block rounded-md border border-blue-600 bg-blue-600 px-3 py-1 text-white text-xs
+                        <a href="{{ route('receptionist.reservations.detail', $item ?? 0) }}" class="inline-block rounded-md border border-blue-600 bg-blue-600 px-3 py-1 text-white text-xs
                         font-medium hover:bg-transparent hover:text-blue-600 transition">
                             Detail
                         </a>

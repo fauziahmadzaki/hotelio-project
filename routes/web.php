@@ -8,7 +8,9 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\FacilityController;
+use App\Http\Controllers\RoomTypeController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\ReceptionistController;
 
 // public 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -53,9 +55,22 @@ Route::middleware(['auth', 'role:user,admin'])
                 Route::get('/', 'index')->name('index');
                 Route::get('/create', 'create')->name('create');
                 Route::post('/', 'store')->name('store');
-                Route::get('/detail/{id}', 'detail')->name('detail');
+                Route::get('/edit/{id}', 'edit')->name('edit');
                 Route::put('/update/{id}', 'update')->name('update');
+                Route::get('/detail/{id}', 'detail')->name('detail');
                 Route::delete('/destroy/{id}', 'destroy')->name('destroy');
+            });
+
+        Route::controller(RoomTypeController::class)
+            ->prefix('room-types')
+            ->name('room-types.')
+            ->group(function () {
+               Route::get('/', 'index')->name('index'); 
+               Route::get('/create', 'create')->name('create'); 
+               Route::post('/store', 'store')->name('store');
+               Route::get('/edit/{roomType}', 'edit')->name('edit');
+               Route::put('/update/{roomType}', 'update')->name('update');
+               Route::delete('/{roomType}', 'destroy')->name('destroy');
             });
 
         Route::controller(ReservationController::class)
@@ -64,10 +79,12 @@ Route::middleware(['auth', 'role:user,admin'])
             ->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::get('/create', 'create')->name('create');
-
-                Route::post('/store', 'store')->name('store');
-                Route::get('/{reservation}', 'show')->name('show');
-                Route::put('/{reservation}', 'update')->name('update');
+                Route::post('/store', 'store')->name('store'); // Phase 1 ➡️ Preview
+                Route::post('/save', 'save')->name('save'); // Phase 1 ➡️ Preview
+                Route::get('/create/preview/{id}', 'preview')->name('preview'); // Phase 2 ➡️ Simpan ke DB
+                Route::get('/edit/{reservation}', 'edit')->name('edit');
+                Route::get('/show/{reservation}', 'show')->name('detail');
+                Route::put('/update/{reservation}', 'update')->name('update');
                 Route::delete('/{reservation}', 'destroy')->name('destroy');
             });
 
@@ -94,53 +111,32 @@ Route::middleware(['auth', 'role:user,admin'])
                     Route::put('/update/{income}', 'update')->name('update');
                     Route::delete('/destroy/{income}', 'destroy')->name('destroy');
     });
+
+    
 });
 
 Route::middleware(['auth', 'role:receptionist,admin'])
     ->prefix('receptionist')
     ->name('receptionist.')
     ->group(function () {
-        Route::controller(\App\Http\Controllers\ReceptionistController::class)->group(function () {
-            Route::get('/', 'index')->name('dashboard');
+        Route::controller(ReceptionistController::class)->group(function(){
+            Route::get('/', 'index')->name('index');
             Route::get('/reservations', 'showActiveReservations')->name('reservations.index');
-            Route::get('/reservation/completed', 'showCompletedReservations')->name('reservations.completed');
-// Reservasi dibatalkan
-            Route::get('/reservation/cancelled', 'showCancelledReservations')->name('reservations.cancelled');
-            // Route::get('/reservations', 'listReservations')->name('reservations.index');
-            // Route::get('/reservations',  'reservations')->name('reservations.index');
-            Route::patch('/reservations/{id}',  'updateReservationStatus')->name('reservations.update');
-            Route::get('/reservations/create', 'create')->name('reservations.create');
-            Route::post('/reservations', 'storeReservation')->name('reservations.store');
-            Route::get('/reservations/detail/{reservation}', 'show')->name('reservations.show');
+            Route::patch('/reservations/update/{id}', 'updateReservationStatus')->name('reservations.update');
+            Route::get('/reservations/completed', 'showCompletedReservations')->name('reservations.completed');
+            Route::get('/reservations/cancelled', 'showCancelledReservations')->name('reservations.cancelled');
+        });
+        Route::prefix('reservations')
+            ->name('reservations.')->controller(\App\Http\Controllers\ReservationController::class)->group(function () {
+                Route::get('/create', 'create')->name('create');
+                Route::post('/store', 'store')->name('store'); // Phase 1 ➡️ Preview
+                Route::get('/create/preview/{id}', 'preview')->name('preview'); // Phase 2 ➡️ Simpan ke DB
+                Route::post('/save', 'save')->name('save'); // Phase 1 ➡️ Preview
+                Route::get('/show/{reservation}', 'show')->name('detail');
+                Route::delete('/destroy/{reservation}', 'destroy')->name('destroy');
             
         });
             
 
     });
 
-Route::middleware(['auth', 'role:user,guest'])
-    ->prefix('dashboard')
-    ->name('guest.')
-    ->group(function () {
-
-        Route::controller(GuestController::class)->group(function () {
-            Route::get('/', 'index')->name('dashboard');
-            Route::get('/data', 'getDashboardData')->name('dashboard.data');
-            Route::get('/profile', 'showProfile')->name('profile.show');
-            Route::post('/profile', 'updateProfile')->name('profile.update');
-        });
-
-        Route::controller(GuestController::class)
-            ->prefix('reservations')
-            ->name('reservations.')
-            ->group(function () {
-                Route::get('/',  'myReservations')->name('index');
-                Route::get('/create/{id}/step1', 'showCreateReservation')->name('create1');
-                Route::middleware('reservation.inprogress')->group(function () {
-                    Route::post('/create/step1', 'storePhaseOne')->name('store1');
-                    Route::get('/create/{id}/step2', 'showCreatePhaseTwo')->name('create2');
-                    Route::post('/create/step2', 'storeReservation')->name('store2');
-                });
-                Route::get('/receipt/{id}', 'showReceipt')->name('receipt');
-            });
-    });

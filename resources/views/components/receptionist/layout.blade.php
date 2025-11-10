@@ -53,8 +53,7 @@
                 <ul class="mt-6 space-y-1">
                     {{-- Dashboard --}}
                     <li>
-                        <x-admin.navlink href="{{ route('receptionist.dashboard') }}"
-                            :active="request()->routeIs('receptionist.dashboard')">
+                        <x-admin.navlink href="{{ route('receptionist.index') }}">
                             Dashboard
                         </x-admin.navlink>
                     </li>

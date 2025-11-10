@@ -1,6 +1,6 @@
 <x-admin.layout>
     <x-card.index class="max-w-2xl mx-auto p-6 space-y-6">
-        <h1 class="text-2xl font-semibold text-gray-800  pb-2">Tambah Kamar</h1>
+        <h1 class="text-2xl font-semibold text-gray-800 pb-2">Tambah Kamar</h1>
 
         <form action="{{ route('admin.rooms.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
@@ -12,6 +12,24 @@
             {{-- Nomor Kamar --}}
             <x-input-group label="Nomor Kamar" id="room_code" name="room_code" type="text" placeholder="A0231"
                 value="{{ old('room_code') }}" error="{{ $errors->first('room_code') }}" />
+
+            {{-- Tipe Kamar --}}
+            <div>
+                <x-label for="room_type_id">Tipe Kamar</x-label>
+                @error('room_type_id')
+                <x-error>{{ $message }}</x-error>
+                @enderror
+
+                <select id="room_type_id" name="room_type_id"
+                    class="w-full mt-2 border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-violet-500 focus:outline-none">
+                    <option value="">-- Pilih Tipe Kamar --</option>
+                    @foreach ($roomTypes as $type)
+                    <option value="{{ $type->id }}" {{ old('room_type_id')==$type->id ? 'selected' : '' }}>
+                        {{ $type->room_type_name }}
+                    </option>
+                    @endforeach
+                </select>
+            </div>
 
             {{-- Deskripsi --}}
             <x-input-group label="Deskripsi" id="room_description" name="room_description" type="textarea"
@@ -26,25 +44,6 @@
             <x-input-group label="Harga" id="room_price" name="room_price" type="number" placeholder="100000"
                 value="{{ old('room_price') }}" error="{{ $errors->first('room_price') }}" />
 
-            {{-- Fasilitas --}}
-            <div>
-                <x-label>Fasilitas</x-label>
-                @error('facilities')
-                <x-error>{{ $message }}</x-error>
-                @enderror
-
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
-                    @foreach ($facilities as $item)
-                    <label class="flex items-center gap-2 text-sm text-gray-700">
-                        <input type="checkbox" name="facilities[]" value="{{ $item->id }}" {{ in_array($item->id,
-                        old('facilities', [])) ? 'checked' : '' }}
-                        class="accent-violet-600 rounded-md"
-                        >
-                        <span>{{ $item->facility_name }}</span>
-                    </label>
-                    @endforeach
-                </div>
-            </div>
 
             {{-- Gambar --}}
             <div>

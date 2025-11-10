@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class HomeController extends Controller
 {
     public function index(){
-        
+
         return view('welcome', ['rooms'=> Room::where('room_status', 'available')->get()] );
     }
     public function rooms(Request $request){
@@ -44,5 +44,12 @@ class HomeController extends Controller
             'sort'  => $sort, // bisa dipakai di view untuk menampilkan status filter aktif
         ]);
 
+    }
+
+    public function detail(Room $room){
+
+        return view('detail', [
+            'room' => $room,
+        ]);
     }
 }
